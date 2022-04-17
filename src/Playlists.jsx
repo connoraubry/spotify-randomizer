@@ -22,9 +22,15 @@ function PlaylistRows ({items}) {
             <tr key={index}> 
                 <td>
                     <button className='muted-button'>
-                        <img src={playlist.images[0].url}
-                            height="100" width="100"
-                        ></img>
+                        <div className='flex-row'>
+                            <div className='flex-small one-fourth'>
+                                <img src={playlist.images[0].url}
+                                    height="100" width="100"></img>
+                            </div>
+                            <div className='flex-large vertical-center'>{playlist.name}</div>
+
+                        </div>
+
                     </button>
 
                 </td>
@@ -48,6 +54,33 @@ function PlaylistTable({playlist}) {
             <PlaylistRows items={playlist.items} />
         </table>
     )
+}
+
+
+function PlayListList({playlists}) {
+
+    const rows = playlists.items.map((playlist, index) => {
+        return (
+            <div key={index}>
+                <button className='muted-button full-button'>
+                    <div className='flex-row'>
+                        <div className='flex-small one-third'>
+                            <img src={playlist.images[0].url} height='100' width='100'></img>
+                        </div>
+                        <div className='flex-small vertical-center'>{playlist.name}</div>
+                    </div>
+                </button>
+            </div>
+        )
+    });
+
+    return (
+        <div>
+                {rows}
+        </div>
+
+    )
+
 }
 
 function Playlist ({url, token, dataType}) {
@@ -80,11 +113,12 @@ function Playlist ({url, token, dataType}) {
     }
 
     return(
-        <div>
-            {dataType}
-            <button onClick={onClick}>Find Data</button>
-            <PlaylistTable playlist={playlist} />
-        </div>
+        <section id="playlist">
+            <article>
+                <button onClick={onClick}>Get Playlists</button>
+                <PlayListList playlists={playlist} />
+            </article>
+        </section>
     )
     
 }

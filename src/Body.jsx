@@ -4,7 +4,7 @@ import axios from 'axios'
 import Data from './Data'
 import Userdata from './Userdata';
 import Playlist from './Playlists';
-
+import Songs from './Songs';
 
 var userDataDefault =  {
     "country": "",
@@ -52,11 +52,20 @@ function Body ({token}) {
 
 
     return(
-        <div className="medium-container horizontal-center">
+        <div className="medium-container">
             <Header userdata={userdata} />
-            <button onClick={onClick}>Get user data</button>
-            <Userdata userdata={userdata} />
-            <Playlist token={token} url={"/auth/playlists"} dataType={"Playlist Data"}/>
+            <div className='medium-container'>
+                <button onClick={onClick}>Get user data</button>
+                <Userdata userdata={userdata} />
+            </div>
+            <div className='flex-row'>
+                <div className='flex-small half'>
+                    <Playlist token={token} url={"/auth/playlists"} dataType={"Playlist Data"}/>
+                </div>
+                <div className='flex-small half'>
+                    <Songs token={token} url={"/auth/top-songs"} dataType={"test"} />
+                </div>
+            </div>
         </div>
 
     )

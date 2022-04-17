@@ -31,7 +31,7 @@ app.get('/auth/test', (req, res) => {
 
 app.get('/auth/login', (req, res) => {
 
-  var scope = "streaming user-read-email user-read-private"
+  var scope = "user-read-email user-read-private user-top-read playlist-read-private"
   var state = generateRandomString(16);
 
   var auth_query_parameters = new URLSearchParams({
@@ -101,6 +101,19 @@ app.get('/auth/playlists', (req, res) => {
   };
   request.get(options, function(error, response, body) {
     res.json({playlists: body})
+  })
+})
+
+app.get('/auth/top-songs', (req, res) => {
+  var access_token = req.query.access_token
+
+  var options = {
+    url: 'https://api.spotify.com/v1/me/top/tracks',
+    headers: { 'Authorization': 'Bearer ' + access_token},
+    json: true
+  };
+  request.get(options, function(error, response, body) {
+    res.json({songs: body})
   })
 })
 
