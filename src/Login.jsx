@@ -2,13 +2,15 @@ import React from 'react';
 
 function Login() {
 
+
     return (
-        <div className="App">
-            <header className="App-header">
-                <a className="btn-spotify" href="/auth/login" >
+        <div className="medium-container" > 
+            <div className='fullscreen vertical-center test-div'>
+                <a className="button accent-button center" href="/auth/login" >
                     Login with Spotify 
-                </a>
-            </header>
+                </a>            
+            </div>
+
         </div>
     );
 }
