@@ -117,6 +117,19 @@ app.get('/auth/top-songs', (req, res) => {
   })
 })
 
+app.get('/auth/playlist-songs', (req, res) => {
+  var access_token = req.query.access_token
+  var playlist_id = req.query.playlist_id
+  var options = {
+    url: 'https://api.spotify.com/v1/playlists/' + playlist_id,
+    headers: { 'Authorization': 'Bearer ' + access_token},
+    json: true
+  };
+  request.get(options, function(error, response, body) {
+    res.json({songs: body})
+  })
+})
+
 app.listen(port, () => {
   console.log(`Listening at http://localhost:${port}`)
 })

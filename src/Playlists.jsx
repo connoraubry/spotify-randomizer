@@ -3,84 +3,56 @@ import axios from 'axios'
 
 
 
-const PlaylistHeader = () => {
+function ButtonWithImage({index, name, image_url, clickFunction}) {
     return (
-        <thead>
-            <tr>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Songs</th>
-                <th>Id</th>
-            </tr>
-        </thead>      
+        <button className='muted-button full-button' onClick={e => clickFunction(index)}>
+            <div className='flex-row'>
+                <div  className='flex-small one-third'>
+                    <img  src={image_url} height='100' width='100'></img>
+                </div>
+                <div className='flex-small vertical-center'>{name}</div>
+            </div>
+        </button>
     )
 }
 
-function PlaylistRows ({items}) {
-    const rows = items.map((playlist, index) =>{
+
+function PlayListSongs({tracks, songClick}) {
+    console.log("Playlist tracks:")
+    console.log(tracks)
+    const rows = tracks.items.map((track_info, index) => {
+        var track = track_info.track
+        var album = track.album
+        console.log(track_info, index, track, album)
         return (
-            <tr key={index}> 
-                <td>
-                    <button className='muted-button'>
-                        <div className='flex-row'>
-                            <div className='flex-small one-fourth'>
-                                <img src={playlist.images[0].url}
-                                    height="100" width="100"></img>
-                            </div>
-                            <div className='flex-large vertical-center'>{playlist.name}</div>
-
-                        </div>
-
-                    </button>
-
-                </td>
-                <td>{playlist.name}</td>
-                <td>{playlist.tracks.total}</td>
-                <td>{playlist.id}</td>
-            </tr>
+            <div key={index}>
+                <ButtonWithImage index={index} name={track.name}
+                    image_url={album.images[0].url} clickFunction={songClick} />
+            </div>
         )
-    })
-
+    });
     return (
-        <tbody>{rows}</tbody>
-    )
-
-}
-
-function PlaylistTable({playlist}) {
-    return (
-        <table>
-            <PlaylistHeader />
-            <PlaylistRows items={playlist.items} />
-        </table>
+        <div>
+            {rows}
+        </div>
     )
 }
 
-
-function PlayListList({playlists}) {
+function PlayListList({playlists, playlistClick}) {
 
     const rows = playlists.items.map((playlist, index) => {
         return (
             <div key={index}>
-                <button className='muted-button full-button'>
-                    <div className='flex-row'>
-                        <div className='flex-small one-third'>
-                            <img src={playlist.images[0].url} height='100' width='100'></img>
-                        </div>
-                        <div className='flex-small vertical-center'>{playlist.name}</div>
-                    </div>
-                </button>
+                <ButtonWithImage index={index} name={playlist.name} 
+                        image_url={playlist.images[0].url} clickFunction={playlistClick}  />
             </div>
         )
     });
-
     return (
         <div>
-                {rows}
+            {rows}
         </div>
-
     )
-
 }
 
 function Playlist ({url, token, dataType}) {
@@ -94,12 +66,12 @@ function Playlist ({url, token, dataType}) {
         'previous': null,
         'next': null
     });
+    const [tracks, setTracks] = useState({
+        'items': [],
+        'limit': 0
+    })
 
     function onClick() {
-        console.log("Button clicked!")
-
-        console.log("Pinging " + url)
-
         axios.get(url, {
             params: {
                 access_token: token
@@ -109,14 +81,37 @@ function Playlist ({url, token, dataType}) {
               console.log(response.data)
               setData(response.data.playlists)
           })
+    }
 
+
+    function playlistClick(playlistKey){ 
+        var playlistID = playlist.items[playlistKey].id
+        axios.get('/auth/playlist-songs', {
+            params: {
+                access_token: token,
+                playlist_id: playlistID
+            }
+            })
+            .then(function (response){
+                setTracks(response.data.songs.tracks)
+            })
+    }
+    function songClick(songKey){
+        console.log(tracks.items[songKey])
     }
 
     return(
         <section id="playlist">
             <article>
                 <button onClick={onClick}>Get Playlists</button>
-                <PlayListList playlists={playlist} />
+                <div className='flex-row'>
+                    <div className='flex-small half'>
+                        <PlayListList playlists={playlist} playlistClick={playlistClick} />
+                    </div>
+                    <div className='flex-small half'>
+                        <PlayListSongs tracks={tracks} songClick={songClick} />
+                    </div>
+                </div>
             </article>
         </section>
     )

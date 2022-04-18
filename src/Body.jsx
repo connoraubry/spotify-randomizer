@@ -34,7 +34,6 @@ function Body ({token}) {
 
 
     const [userdata, setUserdata] = useState(userDataDefault);
- 
 
     function onClick() {
         console.log("Button clicked!")
@@ -58,13 +57,9 @@ function Body ({token}) {
                 <button onClick={onClick}>Get user data</button>
                 <Userdata userdata={userdata} />
             </div>
-            <div className='flex-row'>
-                <div className='flex-small half'>
-                    <Playlist token={token} url={"/auth/playlists"} dataType={"Playlist Data"}/>
-                </div>
-                <div className='flex-small half'>
-                    <Songs token={token} url={"/auth/top-songs"} dataType={"test"} />
-                </div>
+            <div className='medium-container'>
+                <Playlist token={token} url={"/auth/playlists"} dataType={"Playlist Data"}/>
+                    {/* <Songs token={token} url={"/auth/top-songs"} dataType={"test"} /> */}
             </div>
         </div>
 
