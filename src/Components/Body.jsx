@@ -36,9 +36,7 @@ function Body ({token}) {
     const [userdata, setUserdata] = useState(userDataDefault);
 
     function onClick() {
-        console.log("Button clicked!")
-
-        axios.get('/auth/userdata', {
+        axios.get('/api/userdata', {
             params: {
                 access_token: token
             }
@@ -49,16 +47,28 @@ function Body ({token}) {
 
     }
 
+    function testButtonOnClick() { 
+        axios.get('/api/test2', {
+            params: {
+                access_token: token
+            }
+        })
+            .then((response) => {
+                console.log(response)
+            })
+    }
+
 
     return(
         <div className="medium-container">
+            <button onClick={testButtonOnClick}>Test Button</button>
             <Header userdata={userdata} />
             <div className='medium-container'>
                 <button onClick={onClick}>Get user data</button>
                 <Userdata userdata={userdata} />
             </div>
             <div className='medium-container'>
-                <Playlist token={token} url={"/auth/playlists"} dataType={"Playlist Data"}/>
+                <Playlist token={token} url={"/api/playlists"} dataType={"Playlist Data"}/>
                     {/* <Songs token={token} url={"/auth/top-songs"} dataType={"test"} /> */}
             </div>
         </div>

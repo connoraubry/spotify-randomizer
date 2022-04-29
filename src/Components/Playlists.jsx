@@ -4,11 +4,20 @@ import axios from 'axios'
 
 
 function ButtonWithImage({index, name, image_url, clickFunction}) {
+
+
+    var img; 
+    if (image_url != null) {
+        img = <img  src={image_url} height='100' width='100'></img>
+    } else {
+        img  = <div></div>
+    }
+
     return (
         <button className='muted-button full-button' onClick={e => clickFunction(index)}>
             <div className='flex-row'>
                 <div  className='flex-small one-third'>
-                    <img  src={image_url} height='100' width='100'></img>
+                    {img}
                 </div>
                 <div className='flex-small vertical-center'>{name}</div>
             </div>
@@ -18,16 +27,30 @@ function ButtonWithImage({index, name, image_url, clickFunction}) {
 
 
 function PlayListSongs({tracks, songClick}) {
-    console.log("Playlist tracks:")
-    console.log(tracks)
+
     const rows = tracks.items.map((track_info, index) => {
         var track = track_info.track
         var album = track.album
-        console.log(track_info, index, track, album)
+
+        var image_url = null;
+        if (album.images.length > 1) {
+            let image = album.images[1]
+        
+            if ('url' in image){
+                image_url = image.url
+            }
+        }
+        if (album.images.length > 0) {
+            let image = album.images[0]
+            if ('url' in image) {
+                image_url = image.url
+            }
+        }
+
         return (
             <div key={index}>
                 <ButtonWithImage index={index} name={track.name}
-                    image_url={album.images[0].url} clickFunction={songClick} />
+                    image_url={image_url} clickFunction={songClick} />
             </div>
         )
     });
@@ -41,10 +64,24 @@ function PlayListSongs({tracks, songClick}) {
 function PlayListList({playlists, playlistClick}) {
 
     const rows = playlists.items.map((playlist, index) => {
+        var image_url = null;
+        if (playlist.images.length > 1) {
+            let image = playlist.images[1]
+        
+            if ('url' in image){
+                image_url = image.url
+            }
+        }
+        if (playlist.images.length > 0) {
+            let image = playlist.images[0]
+            if ('url' in image) {
+                image_url = image.url
+            }
+        }
         return (
             <div key={index}>
                 <ButtonWithImage index={index} name={playlist.name} 
-                        image_url={playlist.images[0].url} clickFunction={playlistClick}  />
+                        image_url={image_url} clickFunction={playlistClick}  />
             </div>
         )
     });
@@ -68,7 +105,9 @@ function Playlist ({url, token, dataType}) {
     });
     const [tracks, setTracks] = useState({
         'items': [],
-        'limit': 0
+        'limit': 0,
+        'offset': 0,
+        'total': 0,
     })
 
     function onClick() {
@@ -78,7 +117,6 @@ function Playlist ({url, token, dataType}) {
             }
             })
           .then(function (response){
-              console.log(response.data)
               setData(response.data.playlists)
           })
     }
@@ -86,13 +124,14 @@ function Playlist ({url, token, dataType}) {
 
     function playlistClick(playlistKey){ 
         var playlistID = playlist.items[playlistKey].id
-        axios.get('/auth/playlist-songs', {
+        axios.get('/api/playlist-songs', {
             params: {
                 access_token: token,
                 playlist_id: playlistID
             }
             })
             .then(function (response){
+                console.log(response)
                 setTracks(response.data.songs.tracks)
             })
     }

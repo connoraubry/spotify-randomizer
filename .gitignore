@@ -1,6 +1,7 @@
 #Secrets
 *.env
 ignore
+depreciated
 # Logs
 logs
 *.log

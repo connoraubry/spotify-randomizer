@@ -11,9 +11,6 @@ function Data ({url, token, dataType}) {
 
 
     function onClick() {
-        console.log("Button clicked!")
-
-        console.log("Pinging " + url)
 
         axios.get(url, {
             params: {
@@ -21,7 +18,6 @@ function Data ({url, token, dataType}) {
             }
             })
           .then(function (response){
-              console.log(response.data)
               setData(response.data)
           })
 
