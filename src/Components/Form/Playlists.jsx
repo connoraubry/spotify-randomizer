@@ -137,8 +137,7 @@ function PlInput({playlists, playlistClick, input, setInput, selectedID}) {
 }
 
 
-function Playlist ({url, user_id, token, dataType}) {
-
+function Playlist ({user_id, token}) {
 
     const [playlists, setPlaylists] = useState({
         'items': []
