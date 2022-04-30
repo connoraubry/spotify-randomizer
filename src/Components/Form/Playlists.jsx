@@ -169,6 +169,15 @@ function Playlist ({user_id, token}) {
     function playlistClick(playlistKey){ 
         let playlistID = playlists.items[playlistKey].id
         setSelectedPlaylistID(playlistID)
+        axios.get('/api/get-playlist-tracks', {
+            params: {
+                access_token: token,
+                playlist_id: playlistID
+            }
+        })
+            .then(function(response) {
+                console.log(response)
+            })
     }
 
     return(

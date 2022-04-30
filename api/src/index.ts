@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 import {URLSearchParams} from "url"
 import axios from "axios";
 import cors from "cors";
-import {test_fn} from "./randomizer/index";
+import * as randomizer from "./randomizer/index";
 import {getPlaylist, responseToPlaylist} from "./handlers/playlist";
 
 const app = express();
@@ -28,16 +28,6 @@ export const generateRandomString = (length: number) => {
     return text;
 };
 
-
-app.get('/api/test', (_, res) => {
-    res.json({
-        'test': generateRandomString(16),
-        'client id': spotify_client_id,
-        'spotify_secret': spotify_client_secret,
-        'redirect_uri': spotify_redirect_uri,
-        'access_token': access_token
-    })
-})
 
 app.get('/api/auth/login', (_, res) => {
     var scope = "user-read-email user-read-private user-top-read playlist-read-private"
@@ -111,9 +101,6 @@ app.get("/api/userdata", (req, res) => {
         })
 })
 
-
-
-
 app.get("/api/playlist-songs", (req, res) => {
     var access_token = req.query.access_token
     var playlist_id = req.query.playlist_id
@@ -158,7 +145,7 @@ app.get("/api/test/request", (req, res) => {
 
 app.get("/api/test2", (_req, res) => {
     console.log("ENTERING TEST2")
-    console.log(test_fn())
+    console.log(randomizer.test_fn())
     res.json({good: true})
     
 })
@@ -194,7 +181,6 @@ app.get("/api/get-all-playlists", (req, res) => {
             promise.then((innerData) => {
                 playlists.push(...innerData.items)
             })
-            promises.push(getPlaylistData(access_token, url, i, limit))
         }
         
         Promise.all(promises)
@@ -207,6 +193,19 @@ app.get("/api/get-all-playlists", (req, res) => {
             })
     })
 })
+
+
+app.get("/api/get-playlist-tracks", (req, res) => {
+    console.log('Get playlist tracks')
+    var access_token = req.query.access_token
+    var playlist_id = req.query.playlist_id 
+
+    const v = randomizer.get_ordered_tracks(access_token, playlist_id)
+
+    v.then((x) => res.json({items: x}))
+
+})
+
 
 
 async function getPlaylistData(access_token: any, url: any, offset: number, limit: number) {
@@ -225,38 +224,8 @@ async function getPlaylistData(access_token: any, url: any, offset: number, limi
 
 
 
-// function getPD(access_token: any, url: any, offset: number, limit: number) {
-
-//     let options : any = {
-//         url: url,
-//         method: 'GET',
-//         headers: { 'Authorization': 'Bearer ' + access_token },
-//         params: {
-//             offset: offset,
-//             limit: limit
-//         }
-//     }
-//     axios(options).then((result) => {
-//         return result.data
-//     })
-// }
 // start the Express server
 app.listen( port, () => {
     // tslint:disable-next-line:no-console
     console.log( `server started at http://localhost:${ port }` );
 } );
-
-// app.get("/api/playlists", (req, res) => {
-//     var access_token = req.query.access_token
-
-//     var options : any = {
-//       url: 'https://api.spotify.com/v1/me/playlists',
-//       method: 'GET',
-//       headers: { 'Authorization': 'Bearer ' + access_token }
-//     };
-//     // use the access token to access the Spotify Web API
-//     axios(options)
-//         .then((response) => {
-//             res.json({playlists: response.data})
-//         })
-// })
