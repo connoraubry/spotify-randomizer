@@ -92,17 +92,13 @@ function PlayListList({playlists, playlistClick}) {
     )
 }
 
-function Playlist ({url, token, dataType}) {
+function Playlist ({url, user_id, token, dataType}) {
 
-    const [playlist, setData] = useState({
-        'items': [],
-        'href': "",
-        'limit': 0,
-        'offset': 0,
-        'total': 0,
-        'previous': null,
-        'next': null
-    });
+
+    const [playlists, setPlaylists] = useState({
+        'items': []
+    })
+
     const [tracks, setTracks] = useState({
         'items': [],
         'limit': 0,
@@ -111,19 +107,21 @@ function Playlist ({url, token, dataType}) {
     })
 
     function onClick() {
-        axios.get(url, {
+        axios.get('/api/get-all-playlists', {
             params: {
-                access_token: token
+                access_token: token,
+                user_id: user_id
             }
             })
           .then(function (response){
-              setData(response.data.playlists)
+              console.log(response)
+              setPlaylists({'items': response.data.playlists})
           })
     }
 
 
     function playlistClick(playlistKey){ 
-        var playlistID = playlist.items[playlistKey].id
+        var playlistID = playlists.items[playlistKey].id
         axios.get('/api/playlist-songs', {
             params: {
                 access_token: token,
@@ -145,7 +143,7 @@ function Playlist ({url, token, dataType}) {
                 <button onClick={onClick}>Get Playlists</button>
                 <div className='flex-row'>
                     <div className='flex-small half'>
-                        <PlayListList playlists={playlist} playlistClick={playlistClick} />
+                        <PlayListList playlists={playlists} playlistClick={playlistClick} />
                     </div>
                     <div className='flex-small half'>
                         <PlayListSongs tracks={tracks} songClick={songClick} />

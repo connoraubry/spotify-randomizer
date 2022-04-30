@@ -1,3 +1,17 @@
+
+export type SongQueryOptions = {
+    url: string,
+    method: string,
+    headers: any,
+    params: any
+}
+
+export type PlaylistQuery = {
+    playlist: PlayList,
+    error: boolean,
+    error_reason: any
+}
+
 export type PlayList = {
     external_urls: any,
     href: string,
@@ -6,7 +20,8 @@ export type PlayList = {
     name: string,
     tracks: TrackList,
     type: string,
-    uri: string 
+    uri: string,
+    error: boolean
 }
 
 export type TrackList = {

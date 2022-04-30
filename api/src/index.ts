@@ -4,8 +4,7 @@ import {URLSearchParams} from "url"
 import axios from "axios";
 import cors from "cors";
 import {test_fn} from "./randomizer/index";
-import responseToPlaylist from "./handlers/playlist";
-// import axios from "axios";
+import {getPlaylist, responseToPlaylist} from "./handlers/playlist";
 
 const app = express();
 app.use(cors())
@@ -101,6 +100,7 @@ app.get("/", ( _, res ) => {
 } );
 
 app.get("/api/userdata", (req, res) => {
+    console.log('userdata')
     var access_token = req.query.access_token
 
     var options : any = {
@@ -111,7 +111,6 @@ app.get("/api/userdata", (req, res) => {
     // use the access token to access the Spotify Web API
     axios(options)
         .then((response) => {
-            console.log(response)
             res.json({userdata: response.data})
         })
 })
@@ -133,19 +132,18 @@ app.get("/api/playlists", (req, res) => {
 })
 
 
-
-
-
-
-
 app.get("/api/playlist-songs", (req, res) => {
     var access_token = req.query.access_token
     var playlist_id = req.query.playlist_id
     console.log(playlist_id)
     var options : any = {
-      url: 'https://api.spotify.com/v1/playlists/' + playlist_id,
-      method: 'GET',
-      headers: { 'Authorization': 'Bearer ' + access_token }
+        url: 'https://api.spotify.com/v1/playlists/' + playlist_id,
+        method: 'GET',
+        headers: { 'Authorization': 'Bearer ' + access_token },
+        params: {
+            limit: 50,
+            offset: 1000
+        }
     };
     // use the access token to access the Spotify Web API
     axios(options)
@@ -162,6 +160,13 @@ app.get("/api/playlist-songs", (req, res) => {
         })
 })
 
+app.get("/api/playlist-tset", (req, res) => {
+    var access_token = req.query.access_token 
+    var playlist_id = req.query.playlist_id
+    var ps = getPlaylist(access_token, playlist_id)
+    res.json({songs: ps})
+})
+
 
 app.get("/api/test/request", (req, res) => {
     console.log("ENTERING TEST REQUEST")
@@ -176,6 +181,81 @@ app.get("/api/test2", (_req, res) => {
     
 })
 
+app.get("/api/get-all-playlists", (req, res) => {
+
+    var access_token = req.query.access_token
+    var user_id = req.query.user_id 
+
+    const limit = 50 
+
+    let url = 'https://api.spotify.com/v1/users/' + user_id + '/playlists'
+
+    var playlistData  = getPlaylistData(access_token, url, 0, limit);
+
+    //one request, gives us first 50 and Flength 
+
+    var playlists: any[] = []
+
+    playlistData.then((data) => {
+
+
+        playlists.push(...data.items)
+
+        let promises : any[] = [];
+
+        for (let i = data.limit; i < data.total; i += data.limit) {
+            let promise = getPlaylistData(access_token, url, i, limit)
+
+            promises.push(promise)
+            promise.then((innerData) => {
+                playlists.push(...innerData.items)
+            })
+            promises.push(getPlaylistData(access_token, url, i, limit))
+        }
+        
+        Promise.all(promises)
+            .then(() => {
+                console.log("promises")
+                res.json({"playlists": playlists})
+            })
+            .catch((e) => {
+                console.log(e)
+            })
+    })
+})
+
+
+async function getPlaylistData(access_token: any, url: any, offset: number, limit: number) {
+    let options : any = {
+        url: url,
+        method: 'GET',
+        headers: { 'Authorization': 'Bearer ' + access_token },
+        params: {
+            offset: offset,
+            limit: limit
+        }
+    }
+    const result = await axios(options)
+    return result.data
+}
+
+
+
+// function getPD(access_token: any, url: any, offset: number, limit: number) {
+
+//     let options : any = {
+//         url: url,
+//         method: 'GET',
+//         headers: { 'Authorization': 'Bearer ' + access_token },
+//         params: {
+//             offset: offset,
+//             limit: limit
+//         }
+//     }
+//     axios(options).then((result) => {
+//         return result.data
+//     })
+// }
 // start the Express server
 app.listen( port, () => {
     // tslint:disable-next-line:no-console

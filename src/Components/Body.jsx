@@ -35,29 +35,41 @@ function Body ({token}) {
 
     const [userdata, setUserdata] = useState(userDataDefault);
 
-    function onClick() {
+
+    useEffect(() => {
+        if (userdata.id == "")
+            getUserData();
+    
+    }, []);
+
+    async function getUserData() {
         axios.get('/api/userdata', {
             params: {
-                access_token: token
+                access_token: token 
             }
+        })
+            .then((response) => {
+                setUserdata(response.data.userdata)
             })
-          .then(function (response){
-              setUserdata(response.data.userdata)
-          })
+    }
+    
 
+    function onClick() {
+        getUserData();
     }
 
     function testButtonOnClick() { 
-        axios.get('/api/test2', {
+        axios.get('/api/test3', {
             params: {
-                access_token: token
+                access_token: token,
+                // playlist_id: '5jk94t4rDDvKuLaPhoGNb2',
+                user_id: userdata.id
             }
         })
             .then((response) => {
                 console.log(response)
             })
     }
-
 
     return(
         <div className="medium-container">
@@ -68,7 +80,7 @@ function Body ({token}) {
                 <Userdata userdata={userdata} />
             </div>
             <div className='medium-container'>
-                <Playlist token={token} url={"/api/playlists"} dataType={"Playlist Data"}/>
+                <Playlist token={token} user_id={userdata.id} url={"/api/playlists"} dataType={"Playlist Data"}/>
                     {/* <Songs token={token} url={"/auth/top-songs"} dataType={"test"} /> */}
             </div>
         </div>
