@@ -50,8 +50,6 @@ app.get('/api/auth/login', (_, res) => {
         redirect_uri: spotify_redirect_uri,
         state: state     
     })
-
-    console.log(auth_query_parameters.toString())
   
     res.redirect('https://accounts.spotify.com/authorize/?' + auth_query_parameters.toString());
 })
@@ -78,10 +76,8 @@ app.get('/api/auth/callback', (req, res) => {
 
     axios(requestConfig)
         .then((response) => {
-            // tslint:disable-next-line:no-console
-            console.log(response)
-            access_token = response.data.access_token
 
+            access_token = response.data.access_token
             res.redirect('/')
         })
         .catch((err) => {
@@ -115,21 +111,7 @@ app.get("/api/userdata", (req, res) => {
         })
 })
 
-app.get("/api/playlists", (req, res) => {
-    var access_token = req.query.access_token
 
-    var options : any = {
-      url: 'https://api.spotify.com/v1/me/playlists',
-      method: 'GET',
-      headers: { 'Authorization': 'Bearer ' + access_token }
-    };
-    // use the access token to access the Spotify Web API
-    axios(options)
-        .then((response) => {
-            console.log(response)
-            res.json({playlists: response.data})
-        })
-})
 
 
 app.get("/api/playlist-songs", (req, res) => {
@@ -183,6 +165,8 @@ app.get("/api/test2", (_req, res) => {
 
 app.get("/api/get-all-playlists", (req, res) => {
 
+    console.log("Get all playlists")
+
     var access_token = req.query.access_token
     var user_id = req.query.user_id 
 
@@ -215,7 +199,7 @@ app.get("/api/get-all-playlists", (req, res) => {
         
         Promise.all(promises)
             .then(() => {
-                console.log("promises")
+                //console.log("promises")
                 res.json({"playlists": playlists})
             })
             .catch((e) => {
@@ -262,3 +246,17 @@ app.listen( port, () => {
     console.log( `server started at http://localhost:${ port }` );
 } );
 
+// app.get("/api/playlists", (req, res) => {
+//     var access_token = req.query.access_token
+
+//     var options : any = {
+//       url: 'https://api.spotify.com/v1/me/playlists',
+//       method: 'GET',
+//       headers: { 'Authorization': 'Bearer ' + access_token }
+//     };
+//     // use the access token to access the Spotify Web API
+//     axios(options)
+//         .then((response) => {
+//             res.json({playlists: response.data})
+//         })
+// })

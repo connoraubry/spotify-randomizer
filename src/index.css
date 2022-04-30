@@ -37,6 +37,11 @@
   
 }
 
+.scroll-div { 
+  max-height: 440px;
+  overflow-y: auto;
+}
+
  html {
     line-height: 1.15;
     /* 1 */

@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Header from './Header'
 import axios from 'axios'
-import Data from './Data'
 import Userdata from './Userdata';
 import Playlist from './Playlists';
-import Songs from './Songs';
 
 var userDataDefault =  {
     "country": "",
@@ -58,30 +56,29 @@ function Body ({token}) {
         getUserData();
     }
 
-    function testButtonOnClick() { 
-        axios.get('/api/test3', {
-            params: {
-                access_token: token,
-                // playlist_id: '5jk94t4rDDvKuLaPhoGNb2',
-                user_id: userdata.id
-            }
-        })
-            .then((response) => {
-                console.log(response)
-            })
-    }
+    // function testButtonOnClick() { 
+    //     axios.get('/api/test3', {
+    //         params: {
+    //             access_token: token,
+    //             // playlist_id: '5jk94t4rDDvKuLaPhoGNb2',
+    //             user_id: userdata.id
+    //         }
+    //     })
+    //         .then((response) => {
+    //             console.log(response)
+    //         })
+    // }
 
     return(
         <div className="medium-container">
-            <button onClick={testButtonOnClick}>Test Button</button>
+            {/* <button onClick={testButtonOnClick}>Test Button</button> */}
             <Header userdata={userdata} />
             <div className='medium-container'>
-                <button onClick={onClick}>Get user data</button>
+                {/* <button onClick={onClick}>Get user data</button> */}
                 <Userdata userdata={userdata} />
             </div>
             <div className='medium-container'>
                 <Playlist token={token} user_id={userdata.id} url={"/api/playlists"} dataType={"Playlist Data"}/>
-                    {/* <Songs token={token} url={"/auth/top-songs"} dataType={"test"} /> */}
             </div>
         </div>
 

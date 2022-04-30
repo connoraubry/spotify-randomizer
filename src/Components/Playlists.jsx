@@ -3,7 +3,7 @@ import axios from 'axios'
 
 
 
-function ButtonWithImage({index, name, image_url, clickFunction}) {
+function ButtonWithImage({index, name, image_url, clickFunction, isSelected=false}) {
 
 
     var img; 
@@ -12,9 +12,10 @@ function ButtonWithImage({index, name, image_url, clickFunction}) {
     } else {
         img  = <div></div>
     }
-
+    var classType = isSelected ? 'button' : 'muted-button';
+    classType  = classType + " full-button"
     return (
-        <button className='muted-button full-button' onClick={e => clickFunction(index)}>
+        <button className={ classType }  onClick={e => clickFunction(index)}>
             <div className='flex-row'>
                 <div  className='flex-small one-third'>
                     {img}
@@ -61,29 +62,43 @@ function PlayListSongs({tracks, songClick}) {
     )
 }
 
-function PlayListList({playlists, playlistClick}) {
+
+
+
+function PlayListList({playlists, playlistClick, matchString, selectedID}) {
 
     const rows = playlists.items.map((playlist, index) => {
-        var image_url = null;
-        if (playlist.images.length > 1) {
-            let image = playlist.images[1]
-        
-            if ('url' in image){
-                image_url = image.url
+        let image_url = null;
+
+
+        let name = playlist.name.toLowerCase()
+        let result = name.includes(matchString)
+
+        let isSelected = playlist.id == selectedID
+
+        if (result) {
+            //get image 
+            if (playlist.images.length > 1) {
+                let image = playlist.images[1]
+            
+                if ('url' in image){
+                    image_url = image.url
+                }
             }
-        }
-        if (playlist.images.length > 0) {
-            let image = playlist.images[0]
-            if ('url' in image) {
-                image_url = image.url
+            if (playlist.images.length > 0) {
+                let image = playlist.images[0]
+                if ('url' in image) {
+                    image_url = image.url
+                }
             }
+            return (
+                <div key={index}>
+                    <ButtonWithImage index={index} name={playlist.name} 
+                            image_url={image_url} clickFunction={playlistClick} isSelected={isSelected}  />
+                </div>
+            )
         }
-        return (
-            <div key={index}>
-                <ButtonWithImage index={index} name={playlist.name} 
-                        image_url={image_url} clickFunction={playlistClick}  />
-            </div>
-        )
+
     });
     return (
         <div>
@@ -92,6 +107,36 @@ function PlayListList({playlists, playlistClick}) {
     )
 }
 
+
+function PlInput({playlists, playlistClick, input, setInput, selectedID}) {
+
+    //state is typed text 
+    function handleChange(event) {
+        const {_, value} = event.target
+        setInput(value)
+    }
+
+    return (
+        <div>
+            <input type="text" 
+                name="playlistSelector"
+                value={input}
+                onChange={handleChange}
+                placeholder="Enter playlist name..."
+            />
+
+            <div className='flex-row scroll-div' >
+                <PlayListList playlists={playlists} 
+                    playlistClick={playlistClick} 
+                    matchString={input}
+                    selectedID={selectedID} />
+            </div>
+        </div>
+
+    )
+}
+
+
 function Playlist ({url, user_id, token, dataType}) {
 
 
@@ -99,14 +144,12 @@ function Playlist ({url, user_id, token, dataType}) {
         'items': []
     })
 
-    const [tracks, setTracks] = useState({
-        'items': [],
-        'limit': 0,
-        'offset': 0,
-        'total': 0,
-    })
+    const [input, setInput] = useState("")
 
-    function onClick() {
+    const [selectedPlaylistID, setSelectedPlaylistID] = useState("")
+
+
+    async function getAllPlaylists() {
         axios.get('/api/get-all-playlists', {
             params: {
                 access_token: token,
@@ -119,36 +162,28 @@ function Playlist ({url, user_id, token, dataType}) {
           })
     }
 
+    function onClick() {
+        getAllPlaylists()
+    }
+
 
     function playlistClick(playlistKey){ 
-        var playlistID = playlists.items[playlistKey].id
-        axios.get('/api/playlist-songs', {
-            params: {
-                access_token: token,
-                playlist_id: playlistID
-            }
-            })
-            .then(function (response){
-                console.log(response)
-                setTracks(response.data.songs.tracks)
-            })
-    }
-    function songClick(songKey){
-        console.log(tracks.items[songKey])
+        let playlistID = playlists.items[playlistKey].id
+        setSelectedPlaylistID(playlistID)
     }
 
     return(
         <section id="playlist">
             <article>
                 <button onClick={onClick}>Get Playlists</button>
-                <div className='flex-row'>
-                    <div className='flex-small half'>
-                        <PlayListList playlists={playlists} playlistClick={playlistClick} />
-                    </div>
-                    <div className='flex-small half'>
-                        <PlayListSongs tracks={tracks} songClick={songClick} />
-                    </div>
+                <h3>Select a playlist!</h3>
+
+                <div>
+                    <PlInput playlists={playlists} 
+                        playlistClick={playlistClick} 
+                        input={input} setInput={setInput} selectedID={selectedPlaylistID}/>
                 </div>
+
             </article>
         </section>
     )
