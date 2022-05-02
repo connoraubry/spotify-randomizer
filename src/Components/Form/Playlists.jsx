@@ -108,7 +108,7 @@ function PlayListList({playlists, playlistClick, matchString, selectedID}) {
 }
 
 
-function PlInput({playlists, playlistClick, input, setInput, selectedID}) {
+function PlInput({playlists, inputClick, playlistClick, input, setInput, selectedID}) {
 
     //state is typed text 
     function handleChange(event) {
@@ -122,6 +122,7 @@ function PlInput({playlists, playlistClick, input, setInput, selectedID}) {
                 name="playlistSelector"
                 value={input}
                 onChange={handleChange}
+                onClick={inputClick}
                 placeholder="Enter playlist name..."
             />
 
@@ -137,59 +138,52 @@ function PlInput({playlists, playlistClick, input, setInput, selectedID}) {
 }
 
 
-function Playlist ({user_id, token}) {
+function Playlist ({user_id, token, playlistID, setPlaylistID, playlists, setPlaylists, getAllPlaylists}) {
 
-    const [playlists, setPlaylists] = useState({
-        'items': []
-    })
+    // const [playlists, setPlaylists] = useState({
+    //     'items': []
+    // })
 
     const [input, setInput] = useState("")
 
-    const [selectedPlaylistID, setSelectedPlaylistID] = useState("")
-
-
-    async function getAllPlaylists() {
-        axios.get('/api/get-all-playlists', {
-            params: {
-                access_token: token,
-                user_id: user_id
-            }
-            })
-          .then(function (response){
-              console.log(response)
-              setPlaylists({'items': response.data.playlists})
-          })
-    }
-
     function onClick() {
-        getAllPlaylists()
+        if (playlists.items.length == 0){
+            getAllPlaylists()
+        }
     }
 
 
     function playlistClick(playlistKey){ 
-        let playlistID = playlists.items[playlistKey].id
-        setSelectedPlaylistID(playlistID)
-        axios.get('/api/get-playlist-tracks', {
-            params: {
-                access_token: token,
-                playlist_id: playlistID
-            }
-        })
-            .then(function(response) {
-                console.log(response)
+        let currPlaylistID = playlists.items[playlistKey].id
+        console.log(currPlaylistID)
+        if (playlistID == currPlaylistID) {
+            console.log("Setting to null")
+            setPlaylistID("")
+        } else { 
+            console.log("Setting to val")
+            setPlaylistID(currPlaylistID)
+            axios.get('/api/get-playlist-tracks', {
+                params: {
+                    access_token: token,
+                    playlist_id: currPlaylistID
+                }
             })
+                .then(function(response) {
+                    console.log(response)
+                })
+        }
+
     }
 
     return(
         <section id="playlist">
             <article>
-                <button onClick={onClick}>Get Playlists</button>
-                <h3>Select a playlist!</h3>
-
+                {/* <button onClick={onClick}>Get Playlists</button> */}
                 <div>
                     <PlInput playlists={playlists} 
+                        inputClick={onClick}
                         playlistClick={playlistClick} 
-                        input={input} setInput={setInput} selectedID={selectedPlaylistID}/>
+                        input={input} setInput={setInput} selectedID={playlistID}/>
                 </div>
 
             </article>

@@ -42,13 +42,10 @@ export async function get_all_tracks(access_token: any, playlist_id: any) {
     return items
 }
 
-
-
-
 async function get_first_tracks(access_token : any, playlist_id : any) {
     console.log("Get first playlist songs")
     const limit = 50 
-    let fields = "total,items(track(duration_ms,id,name))"
+    let fields = "total,items(track(duration_ms,id,name,uri))"
 
     return getPlaylistTrack(access_token, playlist_id, 0, limit, fields);
 }
@@ -74,7 +71,7 @@ async function getPlaylistTrack(access_token: any,
         playlist_id: any, 
         offset: number, 
         limit: number, 
-        fields: string = "items(track(duration_ms,id,name))") {
+        fields: string = "items(track(duration_ms,id,name,uri))") {
 
     let options : any = {
         url: 'https://api.spotify.com/v1/playlists/' + playlist_id + '/tracks',

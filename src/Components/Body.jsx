@@ -3,6 +3,8 @@ import Header from './Header'
 import axios from 'axios'
 import Userdata from './Userdata';
 import Form from './Form/Form';
+import Test from './Test';
+
 
 var userDataDefault =  {
     "country": "",
@@ -28,9 +30,11 @@ var userDataDefault =  {
 }
 
 
-function Body ({token}) {
+function Body ({token, userdata, setUserdata}) {
 
-    const [userdata, setUserdata] = useState(userDataDefault);
+    // const [userdata, setUserdata] = useState(userDataDefault);
+    const [testState, setTestState] = useState("c")
+
 
     useEffect(() => {
         if (userdata.id == "")
@@ -57,6 +61,7 @@ function Body ({token}) {
                 <Userdata userdata={userdata} />
             </div>
             <Form token={token} user_id={userdata.id} />
+            {/* <Test s={testState} changeS={setTestState} /> */}
         </div>
     )
 }

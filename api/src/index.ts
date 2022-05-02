@@ -30,7 +30,7 @@ export const generateRandomString = (length: number) => {
 
 
 app.get('/api/auth/login', (_, res) => {
-    var scope = "user-read-email user-read-private user-top-read playlist-read-private"
+    var scope = "user-read-email user-read-private user-top-read playlist-read-private playlist-modify-public playlist-modify-private"
     var state = generateRandomString(16);
   
     var auth_query_parameters = new URLSearchParams({
@@ -206,6 +206,39 @@ app.get("/api/get-playlist-tracks", (req, res) => {
 
 })
 
+app.get("/api/submit", (req, res) => {
+    var access_token = req.query.access_token
+    var src_playlist_id = req.query.src_playlist_id
+    var dst_playlist_id = req.query.dst_playlist_id
+
+    const v = randomizer.get_ordered_tracks(access_token, src_playlist_id)
+
+
+
+
+    v.then((x) => {
+        var uris = []
+        for (let i = 0; i < x.length; i ++) {
+            uris.push(x[i].uri)
+        }
+
+        var url = 'https://api.spotify.com/v1/playlists/' + dst_playlist_id + '/tracks';
+        var data = {
+            uris: uris
+        }
+
+        var config = {
+            headers: { 'Authorization': 'Bearer ' + access_token },
+        }
+        axios.post(url, data, config)
+            .then((response) => {
+                console.log(response)
+            })
+        console.log(url, data, config)
+        res.json({items: x})
+    })
+})
+
 
 
 async function getPlaylistData(access_token: any, url: any, offset: number, limit: number) {
@@ -218,11 +251,30 @@ async function getPlaylistData(access_token: any, url: any, offset: number, limi
             limit: limit
         }
     }
+    
     const result = await axios(options)
     return result.data
 }
 
+app.get("/api/create-playlist", (req, res) => {
+    var access_token = req.query.access_token;
+    var user_id = req.query.user_id;
+    var playlist_name = req.query.playlist_name;
 
+    var options : any = {
+        headers: { 'Authorization': 'Bearer ' + access_token },
+    };
+    var url = 'https://api.spotify.com/v1/users/' + user_id + '/playlists';
+    var body = {
+        name: playlist_name,
+        description: "Made with randomizer"
+    }
+    axios.post(url, body, options)
+        .then((response) => {
+            console.log(response)
+            res.send(response.data)
+        })
+})
 
 // start the Express server
 app.listen( port, () => {
