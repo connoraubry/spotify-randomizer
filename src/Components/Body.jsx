@@ -57,12 +57,9 @@ function Body ({token, userdata, setUserdata}) {
     return(
         <div className="medium-container">
             <Header userdata={userdata} />
-            <div className='medium-container'>
-                <Userdata userdata={userdata} />
-            </div>
             <Form token={token} user_id={userdata.id} />
-            {/* <Test s={testState} changeS={setTestState} /> */}
         </div>
+
     )
 }
 

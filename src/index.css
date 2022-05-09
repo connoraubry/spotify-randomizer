@@ -842,8 +842,8 @@
   .accent-button,
   a.accent-button {
     color: #ffffff;
-    border: 1px solid #29de7d;
-    background: #29de7d;
+    border: 1px solid #2fdc80;
+    background: #2fdc80;
   }
   
   .accent-button:hover, .accent-button:focus, .accent-button:active,
@@ -851,8 +851,8 @@
   a.accent-button:focus,
   a.accent-button:active {
     color: #ffffff;
-    border: 1px solid #1cb864;
-    background: #1cb864;
+    border: 1px solid #2fdc80;
+    background: #2fdc80;
   }
   
   .muted-button,

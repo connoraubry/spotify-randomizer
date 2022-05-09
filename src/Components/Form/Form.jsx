@@ -2,30 +2,55 @@ import Playlist from "./Playlists"
 import React, { useState } from 'react';
 import axios from "axios";
 
-function Destination({newPlaylistName, handleChange, buttonClick }) {
+function Destination({newPlaylistName, handleChange, buttonClick, dstPlaylistID}) {
+
+    let buttonClass = (dstPlaylistID == "") ? "button" : "accent-button"
 
     return (
-        <div>
-            <input type="text" 
-                name="newPlaylist"
-                value={newPlaylistName}
-                onChange={handleChange}
-                placeholder="Enter new playlist name"
-            />
-            <button onClick={buttonClick}>Create Playlist (Will be overwritten)</button>
+        <div className="flex-row">
+            <div className="flex-small two-thirds">
+                <input type="text" 
+                    name="newPlaylist"
+                    value={newPlaylistName}
+                    onChange={handleChange}
+                    placeholder="Enter new playlist name"
+                />
+            </div>
+            <div className="flex-small">
+                <button onClick={buttonClick} className={buttonClass}>Use This Playlist (Will be overwritten)</button>
+            </div>
         </div>
     )
 
 }
 
-function Subbo({finalSubmit}) {
+function Submission({finalSubmit, errorString}) {
 
     return (
-        <div>
-            <button onClick={finalSubmit}>Append</button>
+        <div className="small-container">
+        
+            <div className="flex-row">
+                <div className="flex-small one-third"></div>
+                <div className="flex-small one-third">
+                    <button onClick={finalSubmit} className="full-button">Generate Playlist</button>
+
+                </div>
+            </div>
+            <div className="flex-row">
+                <div className="flex-small one-third"></div>
+                <div className="flex-small one-third">
+                    <p>{errorString}</p>
+
+                </div>
+            </div>
         </div>
+
+
     )
 }
+
+
+
 
 function Form({token, user_id}) {
 
@@ -33,20 +58,15 @@ function Form({token, user_id}) {
         'items': []
     })
 
-    const [newPlaylistName, setNewPlaylistName] = useState("")
+    const [newPlaylistName, setNewPlaylistName] = useState("test-create")
     const [srcPlaylistID, setSrcPlaylistID] = useState("")
     const [dstPlaylistID, setDstPlaylistID] = useState("")
+    const [errorString, setErrorString] = useState("")
 
 
-    const [test, setTest] = useState("")
-
-    function handleChange(event) {
-        const {_, value} = event.target
-        setNewPlaylistName(value)
-    }
 
     function finalSubmit(){
-        if (srcPlaylistID != "" || dstPlaylistID != ""){
+        if (srcPlaylistID != "" && dstPlaylistID != ""){
             axios.get("/api/submit", {
                 params: {
                     access_token: token,
@@ -105,18 +125,21 @@ function Form({token, user_id}) {
         }
     }
 
+    function handleChange(event) {
+        const {_, value} = event.target
+        setNewPlaylistName(value)
+        setDstPlaylistID("")
+    }
+
     return (
         <div className='medium-container'>
             <h3>Source playlist</h3>
             <Playlist user_id={user_id} token={token} playlistID={srcPlaylistID} setPlaylistID={setSrcPlaylistID}
                 playlists={playlists} setPlaylists={setPlaylists} getAllPlaylists={getAllPlaylists} />
             <h3>Destination Playlist</h3>
-            {/* <Playlist token={token} user_id={user_id} playlists={playlists} setPlaylists={setPlaylists}
-                playlistID={dstPlaylistID} setPlaylistID={setDstPlaylistID} getAllPlaylists={getAllPlaylists} /> */}
             <Destination newPlaylistName={newPlaylistName} handleChange={handleChange}
-                buttonClick={buttonClick} />
-            <button onClick={finalSubmit}>Generate Playlist</button>
-            {/* <Subbo finalSubmit={finalSubmit} /> */}
+                buttonClick={buttonClick} dstPlaylistID={dstPlaylistID} />
+            <Submission finalSubmit={finalSubmit} errorString={errorString}/>
 
         </div>
     )

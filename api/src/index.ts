@@ -212,30 +212,29 @@ app.get("/api/submit", (req, res) => {
     var dst_playlist_id = req.query.dst_playlist_id
 
     const v = randomizer.get_ordered_tracks(access_token, src_playlist_id)
+    
+    const maxRequest = 100;
 
-
-
-
+    //once we get all tracks, ...
     v.then((x) => {
-        var uris = []
-        for (let i = 0; i < x.length; i ++) {
-            uris.push(x[i].uri)
-        }
 
-        var url = 'https://api.spotify.com/v1/playlists/' + dst_playlist_id + '/tracks';
-        var data = {
-            uris: uris
-        }
+        const t = randomizer.clearDstPlaylist(access_token, dst_playlist_id)
+        console.log('main', t)
 
-        var config = {
-            headers: { 'Authorization': 'Bearer ' + access_token },
-        }
-        axios.post(url, data, config)
-            .then((response) => {
-                console.log(response)
+
+        t.then(() => {
+            console.log("submitting time")
+            var uris = []
+            for (let i = 0; i < Math.min(x.length, maxRequest); i ++) {
+                uris.push(x[i].uri)
+            }
+    
+            const p = randomizer.sendAllTracksPromise(access_token, dst_playlist_id, uris);
+            p.then((_) => {
+                console.log("Done")
             })
-        console.log(url, data, config)
-        res.json({items: x})
+            res.json({items: x})
+        })
     })
 })
 
@@ -271,7 +270,6 @@ app.get("/api/create-playlist", (req, res) => {
     }
     axios.post(url, body, options)
         .then((response) => {
-            console.log(response)
             res.send(response.data)
         })
 })

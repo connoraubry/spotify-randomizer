@@ -12,7 +12,7 @@ function ButtonWithImage({index, name, image_url, clickFunction, isSelected=fals
     } else {
         img  = <div></div>
     }
-    var classType = isSelected ? 'button' : 'muted-button';
+    var classType = isSelected ? 'accent-button' : 'muted-button';
     classType  = classType + " full-button"
     return (
         <button className={ classType }  onClick={e => clickFunction(index)}>
@@ -25,43 +25,6 @@ function ButtonWithImage({index, name, image_url, clickFunction, isSelected=fals
         </button>
     )
 }
-
-
-function PlayListSongs({tracks, songClick}) {
-
-    const rows = tracks.items.map((track_info, index) => {
-        var track = track_info.track
-        var album = track.album
-
-        var image_url = null;
-        if (album.images.length > 1) {
-            let image = album.images[1]
-        
-            if ('url' in image){
-                image_url = image.url
-            }
-        }
-        if (album.images.length > 0) {
-            let image = album.images[0]
-            if ('url' in image) {
-                image_url = image.url
-            }
-        }
-
-        return (
-            <div key={index}>
-                <ButtonWithImage index={index} name={track.name}
-                    image_url={image_url} clickFunction={songClick} />
-            </div>
-        )
-    });
-    return (
-        <div>
-            {rows}
-        </div>
-    )
-}
-
 
 
 
@@ -140,9 +103,6 @@ function PlInput({playlists, inputClick, playlistClick, input, setInput, selecte
 
 function Playlist ({user_id, token, playlistID, setPlaylistID, playlists, setPlaylists, getAllPlaylists}) {
 
-    // const [playlists, setPlaylists] = useState({
-    //     'items': []
-    // })
 
     const [input, setInput] = useState("")
 
@@ -178,7 +138,6 @@ function Playlist ({user_id, token, playlistID, setPlaylistID, playlists, setPla
     return(
         <section id="playlist">
             <article>
-                {/* <button onClick={onClick}>Get Playlists</button> */}
                 <div>
                     <PlInput playlists={playlists} 
                         inputClick={onClick}
