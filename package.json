@@ -1,0 +1,24 @@
+{
+  "name": "spotify-randomizer",
+  "version": "1.0.0",
+  "description": "Fixing Spotify's randomization because they refuse to do so",
+  "main": "index.js",
+  "scripts": {
+    "api": "cd api && npm run dev",
+    "client": "cd client && npm run start",
+    "start": "concurrently \"npm run api\" \"npm run client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/connoraubry/spotify-randomizer.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/connoraubry/spotify-randomizer/issues"
+  },
+  "homepage": "https://github.com/connoraubry/spotify-randomizer#readme",
+  "devDependencies": {
+    "concurrently": "^7.4.0"
+  }
+}
