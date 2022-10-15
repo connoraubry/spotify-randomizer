@@ -28,7 +28,7 @@ auth_routes.get('/login', (_, res) => {
     res.cookie(stateKey, state);
 
     // your application requests authorization
-    var scope = 'user-read-private user-read-email';
+    var scope = "user-read-email user-read-private user-top-read playlist-read-private playlist-modify-public playlist-modify-private"
 
     var auth_query_parameters = new URLSearchParams({
         response_type: "code",
