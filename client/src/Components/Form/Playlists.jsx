@@ -79,10 +79,11 @@ function PlayListList({playlists,
         </div>
     )
     var few = (
-        <div>
+        <div className='flex-large'>
             {newRows}
         </div>
     )
+    console.log(newRows.length)
     if (newRows.length <= 5){
         return few
     } else {
