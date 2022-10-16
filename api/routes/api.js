@@ -140,6 +140,7 @@ api_routes.post("/submit", (req, res) => {
 
         t.then(() => {
             console.log("submitting")
+            console.log(x.length)
             var uris = []
             for (let i = 0; i < Math.min(x.length, maxRequest); i ++) {
                 uris.push(x[i].uri)

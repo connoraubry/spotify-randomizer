@@ -65,7 +65,6 @@ auth_routes.get('/callback', (req, res) => {
         .then((response) => {
             access_token = response.data.access_token;
             refresh_token = response.data.refresh_token;
-            console.log(access_token, refresh_token)
             res.redirect('/')
         })
         .catch((err) => {

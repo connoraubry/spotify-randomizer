@@ -4,7 +4,15 @@ Fixing Spotify's randomization because they refuse to do so
 Personal project to learn React / typescript / API integration. 
 
 ## Running
-Either run using docker or using node
+Either run using docker or using node. 
+
+### Prerequisites
+An `.env` file must be made with the following fields:
+- `SPOTIFY_CLIENT_ID`: the client ID of your spotify dev app
+- `SPOTIFY_CLIENT_SECRET`: the secret value of your spotify dev app
+
+
+For more information, visit [Spotify's Developer page](https://developer.spotify.com).
 
 ### Docker
 ```bash

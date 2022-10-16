@@ -83,7 +83,6 @@ function PlayListList({playlists,
             {newRows}
         </div>
     )
-    console.log(newRows.length)
     if (newRows.length <= 5){
         return few
     } else {

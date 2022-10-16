@@ -27,7 +27,7 @@ function Body(props) {
     return (
         <div className="Body">
             <Header userdata={userdata}/>
-            <Button />
+            {/* <Button /> */}
             {/* { (userdata.id === "") ? <div></div> : <Userdata userdata={userdata} />} */}
             <Form token={props.token} user_id={userdata.id} />
         </div>

@@ -53,7 +53,7 @@ function Form({token, user_id}) {
 
     const [playlists, setPlaylists] = useState([])
 
-    const [newPlaylistName, setNewPlaylistName] = useState("test-create")
+    const [newPlaylistName, setNewPlaylistName] = useState("")
     const [srcPlaylistID, setSrcPlaylistID] = useState("")
     const [dstPlaylistID, setDstPlaylistID] = useState("")
     const [errorString, setErrorString] = useState("")
@@ -101,11 +101,14 @@ function Form({token, user_id}) {
     }
 
     function buttonClick() {
+        if (newPlaylistName === ""){
+            return 
+        }
         setDstPlaylistID("")
         let id = newPlaylistNameId()
         if (id !== "") {
             setDstPlaylistID(id)
-            console.log('exists', id)
+            console.log('exists or is none', id)
         } else {
             var options = {
                 method: 'POST',

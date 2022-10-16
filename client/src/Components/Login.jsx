@@ -9,7 +9,7 @@ function Login() {
                     Login with Spotify 
                 </a>
             </div>
-            <Button />
+            {/* <Button /> */}
         </div>
     );
 }
