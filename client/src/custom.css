@@ -1,0 +1,21 @@
+.test-div {
+    border:#333;
+    border-radius: 2px;
+    border-style: solid;
+}
+
+.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    overflow: auto;
+
+}
+
+
+.scroll-div { 
+    max-height: 440px;
+    overflow-y: auto;
+}
