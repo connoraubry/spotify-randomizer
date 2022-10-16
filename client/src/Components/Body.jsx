@@ -27,10 +27,7 @@ function Body(props) {
     return (
         <div className="Body">
             <Header userdata={userdata}/>
-            { (userdata.id === "") ? <div></div> : <Userdata userdata={userdata} />}
-            <p>Logged in to spotify!</p>
-            <p> {props.token }</p>
-            <Button />
+            {/* { (userdata.id === "") ? <div></div> : <Userdata userdata={userdata} />} */}
             <Form token={props.token} user_id={userdata.id} />
         </div>
     )

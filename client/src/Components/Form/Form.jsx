@@ -77,14 +77,6 @@ function Form({token, user_id}) {
         }
     }
 
-    // async function getUserData() {
-    //     var param = new URLSearchParams({access_token: props.token})
-    //     const response = await fetch("/api/userdata?" + param);
-    //     const json = await response.json();
-    //     console.log(json)
-    //     setUserdata(json.userdata)
-    // }
-
     async function getAllPlaylists() {
         var params = new URLSearchParams({access_token: token, user_id: user_id})
         fetch('/api/get-all-playlists?' + params)

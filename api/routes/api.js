@@ -95,7 +95,6 @@ api_routes.get("/get-playlist-tracks", (req, res) => {
         0, 50)
     
     firstTrackData.then((data) => {
-        console.log(data.items)
         res.json({'tracks': data.items})
     })
     
@@ -133,11 +132,9 @@ api_routes.get("/submit", (req, res) => {
     v.then((x) => {
 
         const t = playlist_fn.clearDstPlaylist(access_token, dst_playlist_id)
-        console.log('main', t)
-
 
         t.then(() => {
-            console.log("submitting time")
+            console.log("submitting")
             var uris = []
             for (let i = 0; i < Math.min(x.length, maxRequest); i ++) {
                 uris.push(x[i].uri)

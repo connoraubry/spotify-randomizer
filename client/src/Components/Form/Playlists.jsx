@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 function ButtonWithImage({index, name, image_url, clickFunction, isSelected=false}) {
 
@@ -37,7 +37,7 @@ function PlayListList({playlists,
 
         let isSelected = playlist.id === selectedID
 
-        if (result) {
+        if ((selectedID === "" && result) || (selectedID !== "" && isSelected)) {
             //get image 
             if (playlist.images.length > 1) {
                 let image = playlist.images[1]
@@ -64,11 +64,23 @@ function PlayListList({playlists,
         return 
 
     });
-    return (
-        <div>
+
+    var multi = (
+        <div className='flex-row'>
+            <div className='flex-small'>
+                {rows.filter((element, index) => {return index % 2 === 0 })}
+            </div>
+            <div className='flex-small'>
+                {rows.filter((element, index) => {return index % 2 === 1 })}
+            </div>
+        </div>
+    )
+    var one = (
+        <div className='flex-row'>
             {rows}
         </div>
     )
+    return multi
 }
 
 
@@ -85,6 +97,7 @@ function PlInput({playlists,
 
     return (
         <div>
+
             <input type="text" 
                 name="playlistSelector"
                 value={input}
@@ -140,7 +153,6 @@ function Playlist ({user_id, token, playlistID, setPlaylistID, playlists, setPla
         <section id="playlist">
             <article>
                 <div>
-                    <p>Playlist holder</p>
                     <PlInput playlists={playlists} 
                         // inputClick={onClick}
                         playlistClick={playlistClick} 
