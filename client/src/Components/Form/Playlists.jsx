@@ -12,14 +12,16 @@ function ButtonWithImage({index, name, image_url, clickFunction, isSelected=fals
     var classType = isSelected ? 'accent-button' : 'muted-button';
     classType  = classType + " full-button"
     return (
-        <button className={ classType }  onClick={e => clickFunction(index)}>
-            <div className='flex-row'>
-                <div  className='flex-small one-third'>
-                    {img}
+        <div className='flex-small  full-container'>
+            <button className={ classType }  onClick={e => clickFunction(index)}>
+                <div className='flex-row'>
+                    <div  className='flex-small one-third '>
+                        {img}
+                    </div>
+                    <div className='flex-small two-thirds vertical-center '>{name}</div>
                 </div>
-                <div className='flex-small vertical-center'>{name}</div>
-            </div>
-        </button>
+            </button>
+        </div>
     )
 }
 
@@ -62,25 +64,30 @@ function PlayListList({playlists,
             )
         }
         return 
-
     });
+
+    var newRows = rows.filter((element) => {return element !== undefined})
 
     var multi = (
         <div className='flex-row'>
-            <div className='flex-small'>
-                {rows.filter((element, index) => {return index % 2 === 0 })}
+            <div className='flex-large '>
+                {newRows.filter((element, index) => {return index % 2 === 0 })}
             </div>
-            <div className='flex-small'>
-                {rows.filter((element, index) => {return index % 2 === 1 })}
+            <div className='flex-large '> 
+                {newRows.filter((element, index) => {return index % 2 === 1 })}
             </div>
         </div>
     )
-    var one = (
-        <div className='flex-row'>
-            {rows}
+    var few = (
+        <div>
+            {newRows}
         </div>
     )
-    return multi
+    if (newRows.length <= 5){
+        return few
+    } else {
+        return multi
+    }
 }
 
 
@@ -106,7 +113,7 @@ function PlInput({playlists,
                 placeholder="Enter playlist name..."
             />
 
-            <div className='flex-row scroll-div' >
+            <div className='flex-row scroll-div ' >
                 <PlayListList playlists={playlists} 
                     playlistClick={playlistClick} 
                     matchString={input}
