@@ -6,9 +6,14 @@ function Button(){
     function buttonFn() {
         console.log('hello')
         setText("hi")
-        fetch("/api/test")
-        .then(res => res.json())
-        .then(data => setText(data.text))
+        var options = {
+            method: 'POST',            
+            body: JSON.stringify({access_token: 12345,}),
+            headers: {
+                "Content-Type": "application/json"
+              }
+        }
+        fetch("/api/test_post", options)
     }
 
     return (

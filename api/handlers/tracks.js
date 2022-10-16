@@ -11,9 +11,9 @@ export async function get_ordered_tracks(access_token, playlist_id) {
 
     var all_tracks = await get_all_tracks(access_token, playlist_id);
     // all_tracks.sort(compare)
-    return all_tracks
+    // return all_tracks
 
-    // return shuffle(all_tracks)
+    return shuffle(all_tracks)
 }
 
 export async function get_all_tracks(access_token, playlist_id) {
@@ -34,7 +34,6 @@ export async function get_all_tracks(access_token, playlist_id) {
     return items
 }
 async function get_first_tracks(access_token, playlist_id) {
-    // console.log("Get first playlist songs")
     const limit = 50 
     let fields = "total,items(track(duration_ms,id,name,uri))"
 
@@ -101,4 +100,22 @@ export async function sendTracksPromise(access_token, dst_playlist_id, uris) {
         headers: { 'Authorization': 'Bearer ' + access_token },
     }
     return axios.post(url, data, config)
+}
+
+function shuffle(array) {
+    let currentIndex = array.length;
+    let randomIndex;
+
+    while (currentIndex != 0) {
+
+        // Pick a remaining element.
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        // And swap it with the current element.
+        [array[currentIndex], array[randomIndex]] = [
+        array[randomIndex], array[currentIndex]];
+    }
+
+    return array;
 }

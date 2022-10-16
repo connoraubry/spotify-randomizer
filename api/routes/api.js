@@ -100,10 +100,10 @@ api_routes.get("/get-playlist-tracks", (req, res) => {
     
 })
 
-api_routes.get("/create-playlist", (req, res) => {
-    var access_token = req.query.access_token;
-    var user_id = req.query.user_id;
-    var playlist_name = req.query.playlist_name;
+api_routes.post("/create-playlist", (req, res) => {
+    var access_token = req.body.access_token;
+    var user_id = req.body.user_id;
+    var playlist_name = req.body.playlist_name;
 
     var options = {
         headers: { 'Authorization': 'Bearer ' + access_token },
@@ -119,10 +119,15 @@ api_routes.get("/create-playlist", (req, res) => {
         })
 })
 
-api_routes.get("/submit", (req, res) => {
-    var access_token = req.query.access_token
-    var src_playlist_id = req.query.src_playlist_id
-    var dst_playlist_id = req.query.dst_playlist_id
+api_routes.post("/test_post", (req, res) => {
+    console.log(req.body.access_token)
+    res.send('POST request to the homepage')
+})
+
+api_routes.post("/submit", (req, res) => {
+    var access_token = req.body.access_token
+    var src_playlist_id = req.body.src_playlist_id
+    var dst_playlist_id = req.body.dst_playlist_id
 
     const v = track_fn.get_ordered_tracks(access_token, src_playlist_id)
     

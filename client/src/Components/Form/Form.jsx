@@ -62,16 +62,20 @@ function Form({token, user_id}) {
 
     function finalSubmit(){
         if (srcPlaylistID !== "" && dstPlaylistID !== ""){
-
-            var params = new URLSearchParams({
-                access_token: token,
-                src_playlist_id: srcPlaylistID,
-                dst_playlist_id: dstPlaylistID
-            })
-            fetch("/api/submit?" + params)
+            var options = {
+                method: 'POST',
+                body: JSON.stringify({
+                    access_token: token,
+                    src_playlist_id: srcPlaylistID,
+                    dst_playlist_id: dstPlaylistID
+                }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+            fetch('/api/submit', options)
                 .then((response) => response.json())
                 .then((json) => console.log(json))
-
         } else {
             console.log("Bad req:", srcPlaylistID, dstPlaylistID)
         }
@@ -103,12 +107,18 @@ function Form({token, user_id}) {
             setDstPlaylistID(id)
             console.log('exists', id)
         } else {
-            var params = new URLSearchParams({
-                access_token: token,
-                playlist_name: newPlaylistName,
-                user_id: user_id
-            })
-            fetch('/api/create-playlist?' + params)
+            var options = {
+                method: 'POST',
+                body: JSON.stringify({
+                    access_token: token,
+                    playlist_name: newPlaylistName,
+                    user_id: user_id
+                }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+            fetch('/api/create-playlist', options)
                 .then((response) => response.json())
                 .then((json) => setDstPlaylistID(json.id))
         }
