@@ -16,10 +16,12 @@ function Body(props) {
 
     async function getUserData() {
         var param = new URLSearchParams({access_token: props.token})
-        const response = await fetch("/api/userdata?" + param);
-        const json = await response.json();
-        console.log(json)
-        setUserdata(json.userdata)
+        fetch("/api/userdata?" + param)
+            .then((response) => response.json())
+            .then((json) => {
+                console.log(json)
+                setUserdata(json.userdata)
+            })
     }
 
     return (
