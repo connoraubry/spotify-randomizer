@@ -16,4 +16,10 @@ Order of steps as I see them. Feel free to add / update
 - [ ] Advanced
   - [ ] Slider stuff
 
-etc.. 
+
+Genres to filter by:
+- Country
+- Rock
+- Pop
+- Rap / Hip Hop
+- 

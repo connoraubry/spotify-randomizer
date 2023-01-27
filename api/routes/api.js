@@ -2,6 +2,7 @@ import express from 'express'
 import axios from 'axios'
 import * as playlist_fn from '../handlers/playlists.js'
 import * as track_fn from '../handlers/tracks.js'
+import * as artist_fn from '../handlers/artists.js'
 
 const api_routes  = express.Router()
 
@@ -79,11 +80,7 @@ api_routes.get("/get-all-playlists", (req, res) => {
                 console.log(e)
             })
     })
-
-
 })
-
-
 
 api_routes.get("/get-playlist-tracks", (req, res) => {
     console.log('Get playlist tracks')
@@ -155,4 +152,67 @@ api_routes.post("/submit", (req, res) => {
     })
 })
 
+
+api_routes.post("/test_artists", (req, res) => {
+    var access_token = req.body.access_token
+    var src_playlist_id = req.body.src_playlist_id
+    var filters = req.body.filters 
+    console.log("filters", filters)
+
+
+    const v = track_fn.get_ordered_tracks(access_token, src_playlist_id)
+    
+    //once we get all tracks, ...
+    v.then((x) => {
+        let artists = {}
+
+        for (let i = 0; i < x.length; i ++) {
+            let artist_id = x[i]['artists'][0]['id']
+
+            let exists = Object.keys(artists).includes(artist_id)
+
+            if (exists === false) {
+                let promise = artist_fn.get_artist_info(access_token, artist_id)
+                artists[artist_id] = promise
+            }
+            // let promise = artist_fn.get_artist_info(access_token, artist_id)
+            // promises.push(promise)
+        }
+
+        Promise.all(Object.values(artists))
+            .then((data) => {
+                let keys = Object.keys(artists);
+                let final_items = [];
+
+                for (let i = 0; i < x.length; i ++) {
+                    let artist_id = x[i]['artists'][0]['id'];
+
+                    let index = keys.indexOf(artist_id);
+                    console.log(data[index]['genres']);
+
+                    let genres = data[index]['genres']
+                    for (var j = 0 ; j < genres.length; j++) {
+                        if (filters.includes(genres[j])){
+                            final_items.push(x[i]);
+                            break;
+                        }
+                    }
+                }
+                res.json({items: x, final_items: final_items});
+            })
+    })
+})
+
+api_routes.get("/artist", (req, res) => {
+    console.log('Get artist')
+    var access_token = req.query.access_token
+    var artist_id = req.query.artist_id 
+
+    var artistData = artist_fn.get_artist_info(access_token, artist_id)
+    
+    artistData.then((data) => {
+        res.json({'info': data})
+    })
+    
+})
 export default api_routes

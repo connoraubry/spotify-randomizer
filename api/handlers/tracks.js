@@ -35,13 +35,13 @@ export async function get_all_tracks(access_token, playlist_id) {
 }
 async function get_first_tracks(access_token, playlist_id) {
     const limit = 50 
-    let fields = "total,items(track(duration_ms,id,name,uri))"
+    let fields = "total,items(track(artists,duration_ms,id,name,uri))"
 
     return getPlaylistTrack(access_token, playlist_id, 0, limit, fields);
 }
 
 export async function getPlaylistTrack(access_token, playlist_id, 
-    offset, limit, fields = "items(track(duration_ms,id,name,uri))") {
+    offset, limit, fields = "items(track(artists,duration_ms,id,name,uri))") {
 
     let options = {
         url: 'https://api.spotify.com/v1/playlists/' + playlist_id + '/tracks',

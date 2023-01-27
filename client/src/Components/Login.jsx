@@ -1,5 +1,4 @@
 import React from 'react';
-import Button from './Button';
 
 function Login() {
     return (
@@ -9,7 +8,6 @@ function Login() {
                     Login with Spotify 
                 </a>
             </div>
-            {/* <Button /> */}
         </div>
     );
 }

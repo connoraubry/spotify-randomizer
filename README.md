@@ -11,6 +11,8 @@ An `.env` file must be made with the following fields:
 - `SPOTIFY_CLIENT_ID`: the client ID of your spotify dev app
 - `SPOTIFY_CLIENT_SECRET`: the secret value of your spotify dev app
 
+Create this `.env` file both in the top level directory and in the api/ directory.
+
 
 For more information, visit [Spotify's Developer page](https://developer.spotify.com).
 

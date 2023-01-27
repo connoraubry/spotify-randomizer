@@ -23,7 +23,7 @@ function Destination({newPlaylistName, handleChange, buttonClick, dstPlaylistID}
 
 }
 
-function Submission({finalSubmit, errorString}) {
+function Submission({finalSubmit, errorString, name}) {
 
     return (
         <div className="small-container">
@@ -31,7 +31,7 @@ function Submission({finalSubmit, errorString}) {
             <div className="flex-row">
                 <div className="flex-small one-third"></div>
                 <div className="flex-small one-third">
-                    <button onClick={finalSubmit} className="full-button">Generate Playlist</button>
+                    <button onClick={finalSubmit} className="full-button">{name}</button>
 
                 </div>
             </div>
@@ -81,6 +81,28 @@ function Form({token, user_id}) {
         }
     }
 
+    function testArtist(){
+        if (srcPlaylistID !== ""){
+            var options = {
+                method: 'POST',
+                body: JSON.stringify({
+                    access_token: token,
+                    src_playlist_id: srcPlaylistID,
+                    filters: ["rock", "classic rock"]
+
+                }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+            fetch('/api/test_artists', options)
+                .then((response) => response.json())
+                .then((json) => console.log(json))
+        } else {
+            console.log("Bad req:", srcPlaylistID)
+        } 
+    }
+
     async function getAllPlaylists() {
         var params = new URLSearchParams({access_token: token, user_id: user_id})
         fetch('/api/get-all-playlists?' + params)
@@ -124,11 +146,13 @@ function Form({token, user_id}) {
             fetch('/api/create-playlist', options)
                 .then((response) => response.json())
                 .then((json) => setDstPlaylistID(json.id))
+                .catch((error) => setErrorString(error))
         }
     }
 
     function handleChange(event) {
-        const {_, value} = event.target
+
+        const {_, value} = event.target 
         setNewPlaylistName(value)
         setDstPlaylistID("")
     }
@@ -139,11 +163,12 @@ function Form({token, user_id}) {
             <button onClick={getAllPlaylists} >Load playlists</button>
             <Playlist user_id={user_id} token={token} playlistID={srcPlaylistID} setPlaylistID={setSrcPlaylistID}
                 playlists={playlists} setPlaylists={setPlaylists} getAllPlaylists={getAllPlaylists} />
+
             <h3>Destination Playlist</h3>
             <Destination newPlaylistName={newPlaylistName} handleChange={handleChange}
                 buttonClick={buttonClick} dstPlaylistID={dstPlaylistID} />
-            <Submission finalSubmit={finalSubmit} errorString={errorString}/>
-
+            <Submission finalSubmit={finalSubmit} errorString={errorString} name="Generate Playlist"/>
+            <Submission finalSubmit={testArtist} errorString={errorString} name="test"/>
         </div>
     )
 
