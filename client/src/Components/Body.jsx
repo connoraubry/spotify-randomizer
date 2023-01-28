@@ -27,7 +27,6 @@ function Body(props) {
         <div className="Body">
             <Header userdata={userdata}/>
             <Form token={props.token} user_id={userdata.id} />
-            <Button token={props.token}/>
         </div>
     )
 }

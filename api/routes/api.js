@@ -1,10 +1,36 @@
 import express from 'express'
 import axios from 'axios'
+import fs from 'fs'
 import * as playlist_fn from '../handlers/playlists.js'
 import * as track_fn from '../handlers/tracks.js'
 import * as artist_fn from '../handlers/artists.js'
 
 const api_routes  = express.Router()
+let JSON_Data = load_cache_file()
+
+function load_cache_file() {
+    let rawdata = fs.readFileSync("files/test.json")
+    return JSON.parse(rawdata)  
+}
+
+function mass_update_cache_file(object) {
+    JSON_Data = {...JSON_Data, ...object}
+    fs.writeFile("files/test.json", JSON.stringify(JSON_Data), err => {
+        if (err) {
+            console.error(err)
+        }
+    })
+}
+
+function update_cache_file(key, value){
+    JSON_Data[key] = value
+    fs.writeFile("files/test.json", JSON.stringify(JSON_Data), err => {
+        if (err) {
+            console.error(err)
+        }
+    })
+    
+}
 
 api_routes.get("/test", (_, res) => {
     var test_message = process.env.DOTENV_TEST_VAL || 'dotenv not working'
@@ -14,6 +40,15 @@ api_routes.get("/test", (_, res) => {
         // "client_id": client_id,
         // "client_secret": client_secret
     });
+})
+
+api_routes.get("/test_file", (_, res) => {
+
+    console.log(JSON_Data)
+
+    res.json({
+        "test": "Hello"
+    })
 })
 
 api_routes.get("/userdata", (req, res) => {
@@ -156,52 +191,97 @@ api_routes.post("/submit", (req, res) => {
 api_routes.post("/test_artists", (req, res) => {
     var access_token = req.body.access_token
     var src_playlist_id = req.body.src_playlist_id
+    var dst_playlist_id = req.body.dst_playlist_id
     var filters = req.body.filters 
     console.log("filters", filters)
 
-
+    const t = playlist_fn.clearDstPlaylist(access_token, dst_playlist_id)
     const v = track_fn.get_ordered_tracks(access_token, src_playlist_id)
-    
+
+    const maxRequest = 25
     //once we get all tracks, ...
     v.then((x) => {
+
         let artists = {}
-
-        for (let i = 0; i < x.length; i ++) {
-            let artist_id = x[i]['artists'][0]['id']
-
-            let exists = Object.keys(artists).includes(artist_id)
-
+        let count = 0;
+        let index = 0;
+        while (count < maxRequest && index < x.length) {
+            let artist_id = x[index]['artists'][0]['id']
+            let exists = Object.keys(JSON_Data).includes(artist_id)
+            exists = exists || Object.keys(artists).includes(artist_id)
+            //if not in json object or already requested 
             if (exists === false) {
                 let promise = artist_fn.get_artist_info(access_token, artist_id)
                 artists[artist_id] = promise
+                count += 1;
             }
-            // let promise = artist_fn.get_artist_info(access_token, artist_id)
-            // promises.push(promise)
+            index += 1;
         }
+
+        // for (let i = 0; i < Math.min(maxRequest, x.length); i ++) {
+        //     let artist_id = x[i]['artists'][0]['id']
+
+        //     let exists = Object.keys(JSON_Data).includes(artist_id)
+        //     exists = exists || Object.keys(artists).includes(artist_id)
+
+        //     //if not in json object or already requested 
+        //     if (exists === false) {
+        //         let promise = artist_fn.get_artist_info(access_token, artist_id)
+        //         artists[artist_id] = promise
+        //     }
+        // }
 
         Promise.all(Object.values(artists))
             .then((data) => {
                 let keys = Object.keys(artists);
+                let update = {}
+                for (let i = 0; i < keys.length; i ++){
+                    let artist_id  = keys[i]
+                    let genres = data[i]['genres']
+                    update[artist_id] = genres;
+                }
+                mass_update_cache_file(update)
+
+
                 let final_items = [];
 
                 for (let i = 0; i < x.length; i ++) {
                     let artist_id = x[i]['artists'][0]['id'];
-
-                    let index = keys.indexOf(artist_id);
-                    console.log(data[index]['genres']);
-
-                    let genres = data[index]['genres']
-                    for (var j = 0 ; j < genres.length; j++) {
-                        if (filters.includes(genres[j])){
-                            final_items.push(x[i]);
-                            break;
+                    
+                    if (Object.keys(JSON_Data).includes(artist_id)){
+                        let genres = JSON_Data[artist_id]
+                        if (should_push_item(genres, filters)){
+                            final_items.push(x[i].uri)
                         }
                     }
+
                 }
-                res.json({items: x, final_items: final_items});
+                console.log("Length of playlist", x.length)
+                console.log("Length of request", final_items.length)
+
+                if (final_items.length > 0){
+                    const p = track_fn.sendAllTracksPromise(access_token, dst_playlist_id, final_items);
+                    p.then((_) => {
+                        console.log("Done")
+                    })
+                } 
+
             })
     })
+    res.sendStatus(202)
 })
+
+function should_push_item(genres, filters){
+    if (filters.length == 0){
+        return true 
+    }
+    for (var j = 0; j < genres.length; j ++){
+        if (filters.includes(genres[j])){
+            return true 
+        }
+    }
+    return false 
+}
 
 api_routes.get("/artist", (req, res) => {
     console.log('Get artist')
