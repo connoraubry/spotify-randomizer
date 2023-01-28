@@ -30,11 +30,11 @@ function Submission({finalSubmit, errorString, name}) {
     return (
         <div className="small-container">
             <div className="flex-row">
-                <div className="flex-small one-third"></div>
-                <div className="flex-small one-third">
+                <div className="flex-small one-fourth"></div>
+                <div className="flex-small one-half">
                     <button onClick={finalSubmit} className="full-button">{name}</button>
-
                 </div>
+                <div className="flex-small one-fourth" />
             </div>
             <div className="flex-row">
                 <div className="flex-small one-third"></div>
@@ -77,28 +77,6 @@ function Form({token, user_id}) {
         }
     }
 
-
-    function finalSubmit(){
-        if (srcPlaylistID !== "" && dstPlaylistID !== ""){
-            var options = {
-                method: 'POST',
-                body: JSON.stringify({
-                    access_token: token,
-                    src_playlist_id: srcPlaylistID,
-                    dst_playlist_id: dstPlaylistID
-                }),
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            }
-            fetch('/api/submit', options)
-                .then((response) => response.json())
-                .then((json) => console.log(json))
-        } else {
-            console.error("Bad req. Src playlist id:", srcPlaylistID, "Dst playlist id:", dstPlaylistID)
-        }
-    }
-
     function testArtist(){
         if (srcPlaylistID !== "" && dstPlaylistID !== ""){
             var options = {
@@ -114,7 +92,7 @@ function Form({token, user_id}) {
                     "Content-Type": "application/json"
                 }
             }
-            fetch('/api/test_artists', options)
+            fetch('/api/submit', options)
                 // .then((error) => console.error(error))
         } else {
             console.log("Bad req:", srcPlaylistID, dstPlaylistID)

@@ -5,10 +5,10 @@ import * as playlist_fn from '../handlers/playlists.js'
 import * as track_fn from '../handlers/tracks.js'
 import * as artist_fn from '../handlers/artists.js'
 
+const cache_filepath = "files/cache.json"
 const api_routes  = express.Router()
 let JSON_Data = load_cache_file()
 
-const cache_filepath = "files/cache.json"
 
 function load_cache_file() {
     let rawdata = fs.readFileSync(cache_filepath)
@@ -42,15 +42,6 @@ api_routes.get("/test", (_, res) => {
         // "client_id": client_id,
         // "client_secret": client_secret
     });
-})
-
-api_routes.get("/test_file", (_, res) => {
-
-    console.log(JSON_Data)
-
-    res.json({
-        "test": "Hello"
-    })
 })
 
 api_routes.get("/userdata", (req, res) => {
@@ -153,44 +144,7 @@ api_routes.post("/create-playlist", (req, res) => {
         })
 })
 
-api_routes.post("/test_post", (req, res) => {
-    console.log(req.body.access_token)
-    res.send('POST request to the homepage')
-})
-
 api_routes.post("/submit", (req, res) => {
-    var access_token = req.body.access_token
-    var src_playlist_id = req.body.src_playlist_id
-    var dst_playlist_id = req.body.dst_playlist_id
-
-    const v = track_fn.get_ordered_tracks(access_token, src_playlist_id)
-    
-    const maxRequest = 100;
-
-    //once we get all tracks, ...
-    v.then((x) => {
-
-        const t = playlist_fn.clearDstPlaylist(access_token, dst_playlist_id)
-
-        t.then(() => {
-            console.log("submitting")
-            console.log(x.length)
-            var uris = []
-            for (let i = 0; i < Math.min(x.length, maxRequest); i ++) {
-                uris.push(x[i].uri)
-            }
-    
-            const p = track_fn.sendAllTracksPromise(access_token, dst_playlist_id, uris);
-            p.then((_) => {
-                console.log("Done")
-            })
-            res.json({items: x})
-        })
-    })
-})
-
-
-api_routes.post("/test_artists", (req, res) => {
     var access_token = req.body.access_token
     var src_playlist_id = req.body.src_playlist_id
     var dst_playlist_id = req.body.dst_playlist_id
@@ -212,6 +166,11 @@ api_routes.post("/test_artists", (req, res) => {
             let exists = Object.keys(JSON_Data).includes(artist_id)
             exists = exists || Object.keys(artists).includes(artist_id)
             //if not in json object or already requested 
+
+            if (artist_id == null) {
+                continue
+            }
+
             if (exists === false) {
                 let promise = artist_fn.get_artist_info(access_token, artist_id)
                 artists[artist_id] = promise
@@ -219,19 +178,6 @@ api_routes.post("/test_artists", (req, res) => {
             }
             index += 1;
         }
-
-        // for (let i = 0; i < Math.min(maxRequest, x.length); i ++) {
-        //     let artist_id = x[i]['artists'][0]['id']
-
-        //     let exists = Object.keys(JSON_Data).includes(artist_id)
-        //     exists = exists || Object.keys(artists).includes(artist_id)
-
-        //     //if not in json object or already requested 
-        //     if (exists === false) {
-        //         let promise = artist_fn.get_artist_info(access_token, artist_id)
-        //         artists[artist_id] = promise
-        //     }
-        // }
 
         Promise.all(Object.values(artists))
             .then((data) => {
@@ -295,6 +241,5 @@ api_routes.get("/artist", (req, res) => {
     artistData.then((data) => {
         res.json({'info': data})
     })
-    
 })
 export default api_routes
