@@ -8,14 +8,16 @@ import * as artist_fn from '../handlers/artists.js'
 const api_routes  = express.Router()
 let JSON_Data = load_cache_file()
 
+const cache_filepath = "files/cache.json"
+
 function load_cache_file() {
-    let rawdata = fs.readFileSync("files/test.json")
+    let rawdata = fs.readFileSync(cache_filepath)
     return JSON.parse(rawdata)  
 }
 
 function mass_update_cache_file(object) {
     JSON_Data = {...JSON_Data, ...object}
-    fs.writeFile("files/test.json", JSON.stringify(JSON_Data), err => {
+    fs.writeFile(cache_filepath, JSON.stringify(JSON_Data), err => {
         if (err) {
             console.error(err)
         }
@@ -24,7 +26,7 @@ function mass_update_cache_file(object) {
 
 function update_cache_file(key, value){
     JSON_Data[key] = value
-    fs.writeFile("files/test.json", JSON.stringify(JSON_Data), err => {
+    fs.writeFile(cache_filepath, JSON.stringify(JSON_Data), err => {
         if (err) {
             console.error(err)
         }

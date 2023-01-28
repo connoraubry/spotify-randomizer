@@ -1,3 +1,5 @@
+api/files/*
+
 #Secrets
 *.env
 ignore
