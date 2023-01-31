@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-import Button from "./Button"
 import Header from "./Header";
-import Userdata from "./Userdata";
 import Form from "./Form/Form";
 
 function Body(props) {
@@ -27,8 +25,6 @@ function Body(props) {
     return (
         <div className="Body">
             <Header userdata={userdata}/>
-            {/* <Button /> */}
-            {/* { (userdata.id === "") ? <div></div> : <Userdata userdata={userdata} />} */}
             <Form token={props.token} user_id={userdata.id} />
         </div>
     )

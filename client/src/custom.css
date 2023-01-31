@@ -19,3 +19,7 @@
     max-height: 440px;
     overflow-y: auto;
 }
+
+input {
+    margin-right: 0.5rem;
+}

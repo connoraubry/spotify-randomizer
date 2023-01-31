@@ -5,7 +5,7 @@ function ButtonWithImage({index, name, image_url, clickFunction, isSelected=fals
 
     var img; 
     if (image_url != null) {
-        img = <img  src={image_url} height='100' width='100' alt='album'></img>
+        img = <img  src={image_url} height='80' width='80' alt='album'></img>
     } else {
         img  = <div></div>
     }
@@ -15,10 +15,10 @@ function ButtonWithImage({index, name, image_url, clickFunction, isSelected=fals
         <div className='flex-small  full-container'>
             <button className={ classType }  onClick={e => clickFunction(index)}>
                 <div className='flex-row'>
-                    <div  className='flex-small one-third '>
+                    <div  className='flex-small one-third'>
                         {img}
                     </div>
-                    <div className='flex-small two-thirds vertical-center '>{name}</div>
+                    <div className='flex-small vertical-center'>{name}</div>
                 </div>
             </button>
         </div>
@@ -97,9 +97,8 @@ function PlInput({playlists,
         input, setInput, selectedID}) {
 
     //state is typed text 
-    function handleChange(event) {
-        const {_, value} = event.target
-        setInput(value)
+    function handleChange(event) {        
+        setInput(event.target.value)
     }
 
     return (
@@ -146,28 +145,38 @@ function Playlist ({user_id, token, playlistID, setPlaylistID, playlists, setPla
         } else { 
             console.log("Setting to val")
             setPlaylistID(currPlaylistID)
-            var params = new URLSearchParams({access_token: token, 
-                            playlist_id: currPlaylistID})
-            fetch('/api/get-playlist-tracks?' + params)
-                .then((response) => response.json())
-                .then((json) => console.log(json))
+            // var params = new URLSearchParams({access_token: token, 
+            //                 playlist_id: currPlaylistID})
+
+            //necessary ?? Maybe remove 
+            // fetch('/api/get-playlist-tracks?' + params)
+            //     .then((response) => response.json())
+            //     .then((json) => console.log(json))
                 
         }
 
     }
 
     return(
-        <section id="playlist">
-            <article>
-                <div>
-                    <PlInput playlists={playlists} 
-                        // inputClick={onClick}
-                        playlistClick={playlistClick} 
-                        input={input} setInput={setInput} selectedID={playlistID}/>
+        <div>
+            <h3>Select A Source Playlist</h3>
+            <div className="flex-row">
+                <div className="flex-small three-fourths">
+                    <section id="playlist">
+                        <article>
+                            <div>
+                                <PlInput playlists={playlists} 
+                                    playlistClick={playlistClick} 
+                                    input={input} setInput={setInput} selectedID={playlistID}/>
+                            </div>
+                        </article>
+                    </section>
                 </div>
-
-            </article>
-        </section>
+                <div className="flex-small">
+                    <button onClick={getAllPlaylists} className='full-button' >Load playlists</button>
+                </div>
+            </div>
+        </div>
     )
     
 }
