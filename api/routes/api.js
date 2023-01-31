@@ -1,38 +1,12 @@
 import express from 'express'
 import axios from 'axios'
-import fs from 'fs'
 import * as playlist_fn from '../handlers/playlists.js'
 import * as track_fn from '../handlers/tracks.js'
 import * as artist_fn from '../handlers/artists.js'
+import * as cache_fn from '../handlers/cache.js'
 
-const cache_filepath = "files/cache.json"
 const api_routes  = express.Router()
-let JSON_Data = load_cache_file()
-
-
-function load_cache_file() {
-    let rawdata = fs.readFileSync(cache_filepath)
-    return JSON.parse(rawdata)  
-}
-
-function mass_update_cache_file(object) {
-    JSON_Data = {...JSON_Data, ...object}
-    fs.writeFile(cache_filepath, JSON.stringify(JSON_Data), err => {
-        if (err) {
-            console.error(err)
-        }
-    })
-}
-
-function update_cache_file(key, value){
-    JSON_Data[key] = value
-    fs.writeFile(cache_filepath, JSON.stringify(JSON_Data), err => {
-        if (err) {
-            console.error(err)
-        }
-    })
-    
-}
+let JSON_Data = cache_fn.load_cache_file()
 
 api_routes.get("/test", (_, res) => {
     var test_message = process.env.DOTENV_TEST_VAL || 'dotenv not working'
@@ -53,7 +27,7 @@ api_routes.get("/userdata", (req, res) => {
       method: 'GET',
       headers: { 'Authorization': 'Bearer ' + access_token }
     };
-    // res.json({userdata: 'test', options: options})
+
     // use the access token to access the Spotify Web API
     axios(options)
         .then((response) => {
@@ -79,8 +53,8 @@ api_routes.get("/get-all-playlists", (req, res) => {
 
     const limit = 50 
 
+    //Gets the first 50 playlists + a list of the amount of playlists a user has
     let url = 'https://api.spotify.com/v1/users/' + user_id + '/playlists'
-
     var playlistData  = playlist_fn.getPlaylistData(access_token, url, 0, limit);
 
     var playlists = []
@@ -91,6 +65,7 @@ api_routes.get("/get-all-playlists", (req, res) => {
 
         let promises  = [];
 
+        //Request playlists 51-N
         for (let i = data.limit; i < data.total; i += data.limit) {
             let promise = playlist_fn.getPlaylistData(access_token, url, i, limit)
 
@@ -100,6 +75,7 @@ api_routes.get("/get-all-playlists", (req, res) => {
             })
         }
         
+        //Once all requests are in, return list of all playlists 
         Promise.all(promises)
             .then(() => {
                 res.json({"playlists": playlists})
@@ -110,20 +86,20 @@ api_routes.get("/get-all-playlists", (req, res) => {
     })
 })
 
-api_routes.get("/get-playlist-tracks", (req, res) => {
-    console.log('Get playlist tracks')
-    var access_token = req.query.access_token
-    var playlist_id = req.query.playlist_id 
+// api_routes.get("/get-playlist-tracks", (req, res) => {
+//     console.log('Get playlist tracks')
+//     var access_token = req.query.access_token
+//     var playlist_id = req.query.playlist_id 
 
 
-    var firstTrackData = track_fn.getPlaylistTrack(access_token, playlist_id, 
-        0, 50)
+//     var firstTrackData = track_fn.getPlaylistTrack(access_token, playlist_id, 
+//         0, 50)
     
-    firstTrackData.then((data) => {
-        res.json({'tracks': data.items})
-    })
+//     firstTrackData.then((data) => {
+//         res.json({'tracks': data.items})
+//     })
     
-})
+// })
 
 api_routes.post("/create-playlist", (req, res) => {
     var access_token = req.body.access_token;
@@ -144,6 +120,7 @@ api_routes.post("/create-playlist", (req, res) => {
         })
 })
 
+//TODO: Break up into function
 api_routes.post("/submit", (req, res) => {
     var access_token = req.body.access_token
     var src_playlist_id = req.body.src_playlist_id
@@ -188,7 +165,7 @@ api_routes.post("/submit", (req, res) => {
                     let genres = data[i]['genres']
                     update[artist_id] = genres;
                 }
-                mass_update_cache_file(update)
+                JSON_Data = cache_fn.mass_update_cache_file(JSON_Data, update)
 
 
                 let final_items = [];
@@ -231,15 +208,15 @@ function should_push_item(genres, filters){
     return false 
 }
 
-api_routes.get("/artist", (req, res) => {
-    console.log('Get artist')
-    var access_token = req.query.access_token
-    var artist_id = req.query.artist_id 
+// api_routes.get("/artist", (req, res) => {
+//     console.log('Get artist')
+//     var access_token = req.query.access_token
+//     var artist_id = req.query.artist_id 
 
-    var artistData = artist_fn.get_artist_info(access_token, artist_id)
+//     var artistData = artist_fn.get_artist_info(access_token, artist_id)
     
-    artistData.then((data) => {
-        res.json({'info': data})
-    })
-})
+//     artistData.then((data) => {
+//         res.json({'info': data})
+//     })
+// })
 export default api_routes

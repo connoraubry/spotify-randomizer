@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Header from "./Header";
 import Form from "./Form/Form";
-import Button from "./Button";
 
 function Body(props) {
 

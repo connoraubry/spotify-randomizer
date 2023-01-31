@@ -97,9 +97,8 @@ function PlInput({playlists,
         input, setInput, selectedID}) {
 
     //state is typed text 
-    function handleChange(event) {
-        const {_, value} = event.target
-        setInput(value)
+    function handleChange(event) {        
+        setInput(event.target.value)
     }
 
     return (
@@ -146,11 +145,13 @@ function Playlist ({user_id, token, playlistID, setPlaylistID, playlists, setPla
         } else { 
             console.log("Setting to val")
             setPlaylistID(currPlaylistID)
-            var params = new URLSearchParams({access_token: token, 
-                            playlist_id: currPlaylistID})
-            fetch('/api/get-playlist-tracks?' + params)
-                .then((response) => response.json())
-                .then((json) => console.log(json))
+            // var params = new URLSearchParams({access_token: token, 
+            //                 playlist_id: currPlaylistID})
+
+            //necessary ?? Maybe remove 
+            // fetch('/api/get-playlist-tracks?' + params)
+            //     .then((response) => response.json())
+            //     .then((json) => console.log(json))
                 
         }
 
