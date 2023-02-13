@@ -138,6 +138,11 @@ api_routes.post("/submit", (req, res) => {
         let artists = {}
         let count = 0;
         let index = 0;
+
+        //promise block won't run if we have no promises; we have to have at least one (even if all artists are accounted for)
+        let at_least_one = false; 
+
+        
         while (count < maxRequest && index < x.length) {
             let artist_id = x[index]['artists'][0]['id']
             let exists = Object.keys(JSON_Data).includes(artist_id)
@@ -148,16 +153,18 @@ api_routes.post("/submit", (req, res) => {
                 continue
             }
 
-            if (exists === false) {
+            if (exists === false || at_least_one == false) {
                 let promise = artist_fn.get_artist_info(access_token, artist_id)
                 artists[artist_id] = promise
                 count += 1;
+                at_least_one = true; 
             }
             index += 1;
         }
 
         Promise.all(Object.values(artists))
             .then((data) => {
+                console.log("Success")
                 let keys = Object.keys(artists);
                 let update = {}
                 for (let i = 0; i < keys.length; i ++){
