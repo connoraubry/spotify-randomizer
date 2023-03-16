@@ -3,10 +3,8 @@ import axios from 'axios'
 import * as playlist_fn from '../handlers/playlists.js'
 import * as track_fn from '../handlers/tracks.js'
 import * as artist_fn from '../handlers/artists.js'
-import * as cache_fn from '../handlers/cache.js'
 
 const api_routes  = express.Router()
-let JSON_Data = cache_fn.load_cache_file()
 
 api_routes.get("/test", (_, res) => {
     var test_message = process.env.DOTENV_TEST_VAL || 'dotenv not working'
@@ -131,99 +129,24 @@ api_routes.post("/submit", (req, res) => {
     const t = playlist_fn.clearDstPlaylist(access_token, dst_playlist_id)
     const v = track_fn.get_ordered_tracks(access_token, src_playlist_id)
 
-    const maxRequest = 25
     //once we get all tracks, ...
     v.then((x) => {
 
-        let artists = {}
-        let count = 0;
-        let index = 0;
-
-        //promise block won't run if we have no promises; we have to have at least one (even if all artists are accounted for)
-        let at_least_one = false; 
-
-        
-        while (count < maxRequest && index < x.length) {
-            let artist_id = x[index]['artists'][0]['id']
-            let exists = Object.keys(JSON_Data).includes(artist_id)
-            exists = exists || Object.keys(artists).includes(artist_id)
-            //if not in json object or already requested 
-
-            if (artist_id == null) {
-                continue
-            }
-
-            if (exists === false || at_least_one == false) {
-                let promise = artist_fn.get_artist_info(access_token, artist_id)
-                artists[artist_id] = promise
-                count += 1;
-                at_least_one = true; 
-            }
-            index += 1;
+        let final_items = [];
+        for (let i = 0; i < x.length; i ++) {
+            final_items.push(x[i].uri)
         }
 
-        Promise.all(Object.values(artists))
-            .then((data) => {
-                console.log("Success")
-                let keys = Object.keys(artists);
-                let update = {}
-                for (let i = 0; i < keys.length; i ++){
-                    let artist_id  = keys[i]
-                    let genres = data[i]['genres']
-                    update[artist_id] = genres;
-                }
-                JSON_Data = cache_fn.mass_update_cache_file(JSON_Data, update)
 
-
-                let final_items = [];
-
-                for (let i = 0; i < x.length; i ++) {
-                    let artist_id = x[i]['artists'][0]['id'];
-                    
-                    if (Object.keys(JSON_Data).includes(artist_id)){
-                        let genres = JSON_Data[artist_id]
-                        if (should_push_item(genres, filters)){
-                            final_items.push(x[i].uri)
-                        }
-                    }
-
-                }
-                console.log("Length of playlist", x.length)
-                console.log("Length of request", final_items.length)
-
-                if (final_items.length > 0){
-                    const p = track_fn.sendAllTracksPromise(access_token, dst_playlist_id, final_items);
-                    p.then((_) => {
-                        console.log("Done")
-                    })
-                } 
-
+        if (final_items.length > 0){
+            const p = track_fn.sendAllTracksPromise(access_token, dst_playlist_id, final_items);
+            p.then((_) => {
+                console.log("Done")
             })
+        } 
     })
     res.sendStatus(202)
 })
 
-function should_push_item(genres, filters){
-    if (filters.length == 0){
-        return true 
-    }
-    for (var j = 0; j < genres.length; j ++){
-        if (filters.includes(genres[j])){
-            return true 
-        }
-    }
-    return false 
-}
 
-// api_routes.get("/artist", (req, res) => {
-//     console.log('Get artist')
-//     var access_token = req.query.access_token
-//     var artist_id = req.query.artist_id 
-
-//     var artistData = artist_fn.get_artist_info(access_token, artist_id)
-    
-//     artistData.then((data) => {
-//         res.json({'info': data})
-//     })
-// })
 export default api_routes

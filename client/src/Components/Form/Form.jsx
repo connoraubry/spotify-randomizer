@@ -1,4 +1,3 @@
-import Filters from "./Filters";
 import Playlist from "./Playlists"
 import React, { useState } from 'react';
 
@@ -57,25 +56,8 @@ function Form({token, user_id}) {
     const [srcPlaylistID, setSrcPlaylistID] = useState("")
     const [dstPlaylistID, setDstPlaylistID] = useState("")
     const [errorString, setErrorString] = useState("")
-    const [filters, setFilters] = useState([])
 
-    function updateFilters(newFilter){
-        if (filters.includes(newFilter)) {
-            setFilters(
-                filters.filter(x =>
-                    x !== newFilter
-                  )
-            )
 
-        } else {
-            setFilters(
-                [
-                    ...filters,
-                    newFilter
-                ]
-            )
-        }
-    }
 
     function testArtist(){
         if (srcPlaylistID !== "" && dstPlaylistID !== ""){
@@ -84,8 +66,7 @@ function Form({token, user_id}) {
                 body: JSON.stringify({
                     access_token: token,
                     src_playlist_id: srcPlaylistID,
-                    dst_playlist_id: dstPlaylistID,
-                    filters: filters
+                    dst_playlist_id: dstPlaylistID
 
                 }),
                 headers: {
@@ -157,7 +138,6 @@ function Form({token, user_id}) {
             <Playlist user_id={user_id} token={token} playlistID={srcPlaylistID} setPlaylistID={setSrcPlaylistID}
                 playlists={playlists} setPlaylists={setPlaylists} getAllPlaylists={getAllPlaylists} />
 
-            <Filters updateFilters={updateFilters}/>
 
             <Destination newPlaylistName={newPlaylistName} handleChange={handleChange}
                 buttonClick={buttonClick} dstPlaylistID={dstPlaylistID} />
